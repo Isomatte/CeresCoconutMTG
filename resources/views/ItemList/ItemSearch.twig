@@ -1,0 +1,32 @@
+<!-- SSR:template(item-search) -->
+<script type="x/template" data-component="item-search">
+    <div class="container-max" :class="{'p-0' : $ceres.isShopBuilder}">
+        <div class="position-relative">
+            <div class="d-flex flex-grow-1 position-relative my-2">
+                <input type="search" placeholder="Suchbegriff eingeben" class="search-input flex-grow-1 px-3 py-2" ref="searchInput" v-model="searchString" @input="onValueChanged($event.target.value)"
+                    @keyup.enter="search()" @focus="isSearchFocused = true" @blur="onBlurSearchField($event)" :autofocus="isShopBuilder">
+
+                <slot name="search-button">
+                    <button class="search-submit px-3" type="submit" @click="search()">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </slot>
+            </div>
+            <template v-if="isSearchFocused">
+                <div class="autosuggest-wrapper" v-show="hasAutocompleteResults">
+                    <slot name="autocomplete-suggestions">
+                        <div class="autocomplete-suggestions shadow bg-white w-100 ">
+                            <search-suggestion-item
+                                :show-images="showItemImages"
+                                suggestion-type="item">
+                            </search-suggestion-item>
+                        </div>
+                    </slot>
+                </div>
+            </template>
+        </div>
+    </div>
+</script>
+<!-- /SSR -->
+
+

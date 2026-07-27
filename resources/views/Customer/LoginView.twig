@@ -1,0 +1,53 @@
+<!-- SSR:template(login-view) -->
+<script type="x/template" data-component="login-view">
+    <div class="container-max mt-5">
+        <div class="row mb-5">
+
+            <div class="col-sm-10 offset-sm-1 col-md-6 offset-md-3">
+                <div>
+                    <p class="login-view-title mb-5">${ $translate("Ceres::Template.login") }</p>
+                    <login :backlink="sanitizedBacklink" :has-to-forward="true">
+                        <template #extend-overlay-buttons>
+                            <slot name="extend-overlay-buttons"></slot>
+                        </template>
+                    </login>
+                </div>
+            </div>
+
+
+             <div class="col-sm-10 offset-sm-1 col-md-6 offset-md-3">
+                <div>
+                    <p class="login-view-title mb-5">${ $translate("Ceres::Template.loginOrderAsGuest") }</p>
+                    <div>
+                     <guest-login :backlink="sanitizedBacklink" :initial-email="guestEmail"></guest-login>
+                    </div>
+                </div>
+            </div>
+
+
+             <div class="col-sm-10 offset-sm-1 col-md-6 offset-md-3">
+                <p class="login-view-title mb-5">Sie sind noch kein Kunde?</p>
+                <a class="btn btn-primary btn-block mb-3" :href="registrationUrl">
+                    <i class="fa fa-user-plus" aria-hidden="true"></i>
+                    ${ $translate("Ceres::Template.loginRegister") }
+                </a>
+            </div>
+
+             <div class="col-sm-10 offset-sm-1 col-md-6 offset-md-3 advantages">
+                <p class="login-view-title mb-5">Ihre Vorteile</p>
+                <ul>
+                    <li>Lieferung innerhalb 2 Werktage</li>
+                    <li>Lagerbestand</li>
+                    <li>Produktvielfalt</li>
+                    <li>Expertenberatung</li>
+                </ul>
+            </div>
+
+        </div>
+
+
+    </div>
+</script>
+<!-- /SSR -->
+
+

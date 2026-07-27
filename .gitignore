@@ -1,0 +1,11 @@
+# IDE
+.idea/
+
+# Node (falls lokal gebaut wird)
+node_modules/
+
+# Backups / OS
+*.bak
+*.premerge.bak
+.DS_Store
+Thumbs.db

@@ -1,0 +1,155 @@
+{% import "Ceres::PageDesign.Macros.LayoutContainer" as LayoutContainer %}
+
+<header id="page-header" class="{# fixed-top #} default-header d-print-none">
+    <div class="container-max">
+        <div class="row flex-row-reverse position-relative">
+            <div id="page-header-parent" class="col-12 header-container" {# data-header-offset  #}>
+                <div class="test2"></div>
+                <div class="top-bar header-fw">
+                    <div class="container-max px-0 pr-lg-3">
+                        <div class="row mx-0 flex-row-reverse position-relative">
+                            {{ LayoutContainer.show("Ceres::Header.LeftSide") }}
+                            <div class="top-bar-items">
+                                <div class="controls">
+                                    <ul id="controlsList" class="controls-list mb-0 d-flex list-inline pl-2 pl-sm-1 pl-md-0">
+                                        <li class="list-inline-item control-user">
+                                            <client-only>
+                                                <user-login-handler>
+                                                    <a class="nav-link" data-toggle="modal">
+                                                        <i class="fa fa-user mr-0 mr-sm-1" aria-hidden="true"></i>
+                                                        <span class="d-none d-sm-inline">{{ trans("Ceres::Template.login") }}</span>
+                                                    </a>
+                                                    <a class="nav-link" data-toggle="modal">
+                                                        <i class="fa fa-user-plus mr-0 mr-sm-1" aria-hidden="true"></i>
+                                                        <span class="d-none d-sm-inline">{{ trans("Ceres::Template.loginRegister") }}</span>
+                                                    </a>
+                                                </user-login-handler>
+                                            </client-only>
+                                        </li>
+
+                                        <li class="list-inline-item control-search">
+                                            <a class="anicon anicon-search-xcross nav-link"
+                                                aria-label="toggle search"
+                                                data-toggle="collapse"
+                                                href="#searchBox"
+                                                aria-expanded="false"
+                                                aria-controls="searchBox"
+                                                data-parent="#controlsList">
+                                                <span class="anicon-search-item" aria-hidden="true"></span>
+                                            </a>
+                                        </li>
+                                        {% if services.url.isRouteEnabled("wish-list") %}
+                                            <li class="list-inline-item control-wish-list">
+                                                <lazy-hydrate when-idle>
+                                                    <wish-list-count>
+                                                        <a class="nav-link">
+                                                             <i class="fa fa-heart-o" aria-hidden="true"></i>
+                                                            <span class="badge-right ml-1 d-none d-sm-inline">0</span>
+                                                        </a>
+                                                    </wish-list-count>
+                                                </lazy-hydrate>
+                                            </li>
+                                        {% endif %}
+                                        <li class="list-inline-item control-basket position-relative" @mouseover.once="$store.dispatch('loadComponent', 'basket-preview')">
+                                            <a v-toggle-basket-preview href="#" class="toggle-basket-preview nav-link">
+                                                {% if config("Ceres.header.basket_values") != "sum" %}
+                                                    <span class="mr-2" v-basket-item-quantity="$store.state.basket.data.itemQuantity">0</span>
+                                                {% endif %}
+
+                                                <icon icon="shopping-cart" class-loading="fa-refresh" :loading="$store.state.basket.isBasketLoading"></icon>
+                                                {% if config("Ceres.header.basket_values") != "quantity" %}
+                                                    <span class="badge p-0 ml-2" v-if="!$store.state.basket.showNetPrices" v-basket-item-sum="$store.state.basket.data.itemSum">0,00</span>
+                                                    <span class="badge p-0 ml-2" v-else v-cloak v-basket-item-sum="$store.state.basket.data.itemSumNet">0,00</span>
+                                                {% endif %}
+                                            </a>
+
+                                            <basket-preview v-if="$store.state.lazyComponent.components['basket-preview']" :show-net-prices="{{ showNetPrices | json_encode }}">
+                                                <template #before-basket-item>
+                                                    {{ LayoutContainer.show("Ceres::BasketList.BeforeItem") }}
+                                                </template>
+                                                <template #after-basket-item>
+                                                    {{ LayoutContainer.show("Ceres::BasketList.AfterItem") }}
+                                                </template>
+                                                <template #before-basket-totals>
+                                                    {{ LayoutContainer.show("Ceres::BasketPreview.BeforeBasketTotals") }}
+                                                </template>
+                                                <template #before-item-sum>
+                                                    {{ LayoutContainer.show("Ceres::BasketTotals.BeforeItemSum") }}
+                                                </template>
+                                                <template #after-item-sum>
+                                                    {{ LayoutContainer.show("Ceres::BasketTotals.AfterItemSum") }}
+                                                </template>
+                                                <template #before-shipping-costs>
+                                                    {{ LayoutContainer.show("Ceres::BasketTotals.BeforeShippingCosts") }}
+                                                </template>
+                                                <template #after-shipping-costs>
+                                                    {{ LayoutContainer.show("Ceres::BasketTotals.AfterShippingCosts") }}
+                                                </template>
+                                                <template #before-total-sum>
+                                                    {{ LayoutContainer.show("Ceres::BasketTotals.BeforeTotalSum") }}
+                                                </template>
+                                                <template #before-vat>
+                                                    {{ LayoutContainer.show("Ceres::BasketTotals.BeforeVat") }}
+                                                </template>
+                                                <template #after-vat>
+                                                    {{ LayoutContainer.show("Ceres::BasketTotals.AfterVat") }}
+                                                </template>
+                                                <template #after-total-sum>
+                                                    {{ LayoutContainer.show("Ceres::BasketTotals.AfterTotalSum") }}
+                                                </template>
+                                                <template #after-basket-totals>
+                                                    {{ LayoutContainer.show("Ceres::BasketPreview.AfterBasketTotals") }}
+                                                </template>
+                                                <template #before-checkout-button>
+                                                    {{ LayoutContainer.show("Ceres::BasketPreview.BeforeCheckoutButton") }}
+                                                </template>
+                                                <template #after-checkout-button>
+                                                    {{ LayoutContainer.show("Ceres::BasketPreview.AfterCheckoutButton") }}
+                                                </template>
+                                            </basket-preview>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="container-max px-0 px-lg-3">
+                        <div class="row mx-0 flex-row-reverse position-relative">
+                            <div id="searchBox" class="cmp cmp-search-box collapse">
+                                {% set overrideSearchBar = LayoutContainer.show("Ceres::Search.SearchBar") %}
+                                {% if overrideSearchBar | trim is empty %}
+                                    <item-search></item-search>
+                                {% else %}
+                                    {{ overrideSearchBar | raw }}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {% include "CeresCoconut::PageDesign.Partials.Header.Navigation" %}
+
+				{#
+                <!-- breadcrumb -->
+                {% if not services.template.isHome() and not services.template.isMyAccount() and not services.template.isCheckout() %}
+                    {% include "Ceres::PageDesign.Partials.Header.Breadcrumb" %}
+                    
+                {% endif %}
+                #}
+              
+            </div>
+            
+        </div>
+    </div>
+    <!-- Aktionsbanner //-->
+    <!--  <a href="https://www.mein-tuergriff.de/meintuergriff-exklusiv/" target="_blank">			//-->		 
+    <!--      <div class="header-aktionsbanner widget-fw">											//-->		 
+    <!--          <div class="container-max">														//-->		 
+    <!--                      ⚽ Jeder Griff ein Volltreffer! 🏆									//-->	 		 
+	<!--  					<br> 15% Rabatt mit dem Code WM2026 auf alle MTG Exklusiv Produkte	 	//-->		 			
+    <!--  				    <br><span id="aktions-timer"></span>									//-->	 
+	<!--  		</div> 																				//-->		 
+    <!--      </div>																				//-->			 
+    <!--  </a>																						//-->		 
+</header>

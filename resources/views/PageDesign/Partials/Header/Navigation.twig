@@ -1,0 +1,58 @@
+{% set companyLogo  = config("Ceres.header.company_logo") %}
+{% set showHeaderNavBar = config("Ceres.header.show_navbars") %}
+{% set companyName  = trans("Ceres::Template.headerCompanyName") %}
+{% set useMegaMenu  = config("Ceres.header.megamenu_levels") > 1 %}
+
+<nav class="navbar header-fw p-0 border-bottom{% if useMegaMenu %} megamenu{% else %} normalmenu{% endif %}">
+    <div class="container-max d-block">
+        <div class="row mx-0 position-relative d-flex">
+            <div class="brand-wrapper px-lg-3{% if showHeaderNavBar == "side" %} position-relative{% endif %}">
+                <a class="navbar-brand py-2" href="{{ homepageURL }}">
+                    {{ add_asset('https://cdn02.plentymarkets.com/7am8sgu8j3l3/frontend/Mein_Tuergriff/src/logo.min.webp', 'img', 'preload') }}
+                    <picture>
+                        <source srcset="https://cdn02.plentymarkets.com/7am8sgu8j3l3/frontend/Mein_Tuergriff/src/logo.min.webp" type="image/webp">
+                        <img alt="{{ companyName }}" src="https://cdn02.plentymarkets.com/7am8sgu8j3l3/frontend/Mein_Tuergriff/src/logo.min.png" class="img-fluid" width="238" height="70"/>
+                    </picture>
+                </a>
+            </div>
+
+
+            <!-- Custom -->
+            <div class="search-box">
+                <div class="container-max px-0 px-lg-3">
+                    <div class="row mx-0 flex-row-reverse position-relative">
+                        <div id="searchBox" class="cmp cmp-search-box collapse">
+                            {% set overrideSearchBar = LayoutContainer.show("Ceres::Search.SearchBar") %}
+                            {% if overrideSearchBar | trim is empty %}
+                                <item-search></item-search>
+                            {% else %}
+                                {{ overrideSearchBar | raw }}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="contact_details">
+                <a class="phone" href="tel:071719878036" title="phone">07171 98780-36</a>
+                <a class="email" href="mailto:verkauf@mein-tuergriff.de" title="e-mail">verkauf@mein-tuergriff.de</a>
+            </div>
+            <div class="badges">
+                <div><img src="https://cdn02.plentymarkets.com/7am8sgu8j3l3/frontend/Mein_Tuergriff/src/kauferschutz.min.webp" width="81" height="49"></div>
+                <div><img src="https://cdn02.plentymarkets.com/7am8sgu8j3l3/frontend/Mein_Tuergriff/src/recycling.min.webp" width="51" height="49"></div>
+                <div><img src="https://cdn02.plentymarkets.com/7am8sgu8j3l3/frontend/Mein_Tuergriff/src/trusted.min.webp" width="49" height="49"></div>
+            </div>
+
+
+            <button v-open-mobile-navigation class="navbar-toggler d-lg-none p-3" type="button">
+                &#9776;
+            </button>
+
+            <div class="main-navbar-collapsable d-none d-lg-block">
+                {% if showHeaderNavBar == "top" or showHeaderNavBar == "both" or not services.template.isCategory() %}
+                    {% include "Ceres::PageDesign.Partials.Header.NavigationList" %}
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+</nav>

@@ -1,0 +1,70 @@
+<!-- This template is only used for providing the stylesheet path in the respective container. The stylesheet will only apply if the CeresCoconut Stylesheet data provider is linked in the CMS » Container link menu -->
+{#<script type="text/javascript" src="//widgets.trustedshops.com/reviews/tsSticker/tsProductStickerSummary.js"></script>#}
+
+<script>
+    // Sag dem FISHER-Skript, wo die Bilder extern liegen (MIT Slash am Ende!)
+    window._360g_viewer_url = "https://mtgbilder.de/images/";
+</script>
+
+<!-- Zuerst das 360-Grad Skript laden -->
+<!-- ?v=… ist ein Cache-Buster: der CDN cached die JS unter fester URL. Bei jeder
+     neuen JS-Version diese Zahl hochzählen, damit der CDN frisch lädt. -->
+<script src="{{ plugin_path('CeresCoconut') }}/js/viewercore_mi.js?v=20260703l"></script>
+
+<script src="{{ plugin_path('CeresCoconut') }}/js/script.min.js?v=20260703l"></script>
+
+<script>
+    var mui = function()
+    {
+        var fired = false;
+        var kickTrigger = function()
+        {
+            if(fired === true){return false;}
+
+            // Create a custom event
+            var event = new CustomEvent('minimalUserInteraction');
+
+            // Dispatch the event
+            document.dispatchEvent(event);
+
+            dataLayer.push({
+                'event': 'minimal-user-interaction',
+                'minimal-user-interaction': true
+            });
+            fired = true;
+            return true;
+        }
+
+        document.addEventListener("focus", kickTrigger, { once: true });
+        document.addEventListener("mousemove", kickTrigger, { once: true });
+        document.addEventListener("scroll", kickTrigger, { once: true });
+        document.addEventListener("touchstart", kickTrigger, { once: true });
+
+    }()
+
+
+    // Listen for the custom event
+    document.addEventListener('minimalUserInteraction', function (e) {
+        // Load the Scripts on interaction
+        {% if services.template.isCurrentTemplate("tpl.home") or services.template.isCurrentTemplate("tpl.home.category") %}
+        loadEtrusted();
+        {% endif %}
+
+    });
+      
+        $(".filter-wrapper .card .h3").click(function(e){
+            $(this).toggleClass('collapsed');
+            $(this).parent().toggleClass("nactive");
+        });
+    
+
+    function loadEtrusted() {
+        var script = document.createElement('script');
+        script.src = 'https://integrations.etrusted.com/applications/widget.js/v2';
+        script.defer = true;
+        script.async = true;
+        document.body.appendChild(script);
+    }
+
+
+</script>
