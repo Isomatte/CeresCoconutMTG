@@ -1,6 +1,6 @@
 <?php
 
-namespace CeresCoconut\Providers;
+namespace CeresCoconutMTG\Providers;
 
 use Plenty\Plugin\ServiceProvider;
 use Plenty\Plugin\Events\Dispatcher;
@@ -12,14 +12,14 @@ use IO\Services\ItemSearch\Helper\ResultFieldTemplate;
 use Plenty\Plugin\ConfigRepository;
 use Plenty\Modules\Webshop\Template\Providers\TemplateServiceProvider;
 use Plenty\Modules\ShopBuilder\Contracts\ContentWidgetRepositoryContract;
-use CeresCoconut\Widgets\CustomItemImageCarouselWidget;
+use CeresCoconutMTG\Widgets\CustomItemImageCarouselWidget;
 
 
 /**
- * Class CeresCoconutServiceProvider
- * @package CeresCoconut\Providers
+ * Class CeresCoconutMTGServiceProvider
+ * @package CeresCoconutMTG\Providers
  */
-class CeresCoconutServiceProvider extends ServiceProvider
+class CeresCoconutMTGServiceProvider extends ServiceProvider
 {
     const PRIORITY = 0;
 
@@ -33,7 +33,7 @@ class CeresCoconutServiceProvider extends ServiceProvider
 
     public function boot(Twig $twig, Dispatcher $dispatcher, ConfigRepository $config, ContentWidgetRepositoryContract $widgetRepository)
     {
-        $enabledOverrides = explode(", ", $config->get("CeresCoconut.templates.override"));
+        $enabledOverrides = explode(", ", $config->get("CeresCoconutMTG.templates.override"));
 		// $twig = new \Twig\Environment(...);
 		// $twig->addExtension(new StringExtension());
 
@@ -43,9 +43,9 @@ class CeresCoconutServiceProvider extends ServiceProvider
 		 $dispatcher->listen('IO.Resources.Import', function (ResourceContainer $container)
         {
             // The script is imported in the Footer.twig of Ceres
-            $container->addScriptTemplate('CeresCoconut::Jscript');
-            $container->addStyleTemplate('CeresCoconut::Stylesheet2');
-             $container->addScriptTemplate('CeresCoconut::ItemList.Components.CategoryItem');
+            $container->addScriptTemplate('CeresCoconutMTG::Jscript');
+            $container->addStyleTemplate('CeresCoconutMTG::Stylesheet2');
+             $container->addScriptTemplate('CeresCoconutMTG::ItemList.Components.CategoryItem');
         }, self::PRIORITY);
 
 
@@ -59,22 +59,22 @@ class CeresCoconutServiceProvider extends ServiceProvider
 
             if (in_array("head", $enabledOverrides) || in_array("all", $enabledOverrides))
             {
-                $partial->set('head', 'CeresCoconut::PageDesign.Partials.Head');
+                $partial->set('head', 'CeresCoconutMTG::PageDesign.Partials.Head');
             }
 
             if (in_array("header", $enabledOverrides) || in_array("all", $enabledOverrides))
             {
-                $partial->set('header', 'CeresCoconut::PageDesign.Partials.Header.Header');
+                $partial->set('header', 'CeresCoconutMTG::PageDesign.Partials.Header.Header');
             }
 
             if (in_array("page_design", $enabledOverrides) || in_array("all", $enabledOverrides))
             {
-                $partial->set('page-design', 'CeresCoconut::PageDesign.PageDesign');
+                $partial->set('page-design', 'CeresCoconutMTG::PageDesign.PageDesign');
             }
 
             if (in_array("footer", $enabledOverrides) || in_array("all", $enabledOverrides))
             {
-                $partial->set('footer', 'CeresCoconut::PageDesign.Partials.Footer');
+                $partial->set('footer', 'CeresCoconutMTG::PageDesign.Partials.Footer');
             }
 
 
@@ -86,7 +86,7 @@ class CeresCoconutServiceProvider extends ServiceProvider
 
             $dispatcher->listen('IO.tpl.home', function (TemplateContainer $container)
             {
-                $container->setTemplate('CeresCoconut::Homepage.Homepage');
+                $container->setTemplate('CeresCoconutMTG::Homepage.Homepage');
                 return false;
             }, self::PRIORITY);
         }
@@ -97,7 +97,7 @@ class CeresCoconutServiceProvider extends ServiceProvider
 
             $dispatcher->listen('IO.tpl.category.content', function (TemplateContainer $container)
             {
-                $container->setTemplate('CeresCoconut::Category.Content.CategoryContent');
+                $container->setTemplate('CeresCoconutMTG::Category.Content.CategoryContent');
                 return false;
             }, self::PRIORITY);
         }
@@ -108,7 +108,7 @@ class CeresCoconutServiceProvider extends ServiceProvider
 
             $dispatcher->listen('IO.tpl.category.item', function (TemplateContainer $container)
             {
-                $container->setTemplate('CeresCoconut::Category.Item.CategoryItem');
+                $container->setTemplate('CeresCoconutMTG::Category.Item.CategoryItem');
                 return false;
             }, self::PRIORITY);
         }
@@ -119,7 +119,7 @@ class CeresCoconutServiceProvider extends ServiceProvider
 
             $dispatcher->listen('IO.tpl.basket', function (TemplateContainer $container)
             {
-                $container->setTemplate('CeresCoconut::Basket.Basket');
+                $container->setTemplate('CeresCoconutMTG::Basket.Basket');
                 return false;
             }, self::PRIORITY);
         }
@@ -130,7 +130,7 @@ class CeresCoconutServiceProvider extends ServiceProvider
 
             $dispatcher->listen('IO.tpl.checkout', function (TemplateContainer $container)
             {
-                $container->setTemplate('CeresCoconut::Checkout.CheckoutView');
+                $container->setTemplate('CeresCoconutMTG::Checkout.CheckoutView');
                 return false;
             }, self::PRIORITY);
         }
@@ -141,7 +141,7 @@ class CeresCoconutServiceProvider extends ServiceProvider
 
             $dispatcher->listen('IO.tpl.confirmation', function (TemplateContainer $container)
             {
-                $container->setTemplate('CeresCoconut::Checkout.OrderConfirmation');
+                $container->setTemplate('CeresCoconutMTG::Checkout.OrderConfirmation');
                 return false;
             }, self::PRIORITY);
         }
@@ -152,7 +152,7 @@ class CeresCoconutServiceProvider extends ServiceProvider
 
             // $dispatcher->listen('IO.tpl.login', function (TemplateContainer $container)
             // {
-            //     $container->setTemplate('CeresCoconut::Customer.LoginView');
+            //     $container->setTemplate('CeresCoconutMTG::Customer.LoginView');
             //     return false;
             // }, self::PRIORITY);
 
@@ -167,7 +167,7 @@ class CeresCoconutServiceProvider extends ServiceProvider
 
             $dispatcher->listen('IO.tpl.register', function (TemplateContainer $container)
             {
-                $container->setTemplate('CeresCoconut::Customer.Register');
+                $container->setTemplate('CeresCoconutMTG::Customer.Register');
                 return false;
             }, self::PRIORITY);
         }
@@ -178,7 +178,7 @@ class CeresCoconutServiceProvider extends ServiceProvider
 
             $dispatcher->listen('IO.tpl.item', function (TemplateContainer $container)
             {
-                $container->setTemplate('CeresCoconut::Item.SingleItemWrapper');
+                $container->setTemplate('CeresCoconutMTG::Item.SingleItemWrapper');
                 return false;
             }, self::PRIORITY);
         }
@@ -188,11 +188,11 @@ class CeresCoconutServiceProvider extends ServiceProvider
         {
             // $dispatcher->listen('IO.tpl.search', function (TemplateContainer $container)
             // {
-            //     $container->setTemplate('CeresCoconut::ItemList.ItemSearch');
+            //     $container->setTemplate('CeresCoconutMTG::ItemList.ItemSearch');
             //     return false;
             // }, self::PRIORITY);
             $dispatcher->listen("IO.Resources.Import", function(ResourceContainer $container){
-                $container->addScriptTemplate('CeresCoconut::ItemList.ItemSearch');
+                $container->addScriptTemplate('CeresCoconutMTG::ItemList.ItemSearch');
             },self::PRIORITY);
         }
 
@@ -203,7 +203,7 @@ class CeresCoconutServiceProvider extends ServiceProvider
 
             $dispatcher->listen('IO.tpl.my-account', function (TemplateContainer $container)
             {
-                $container->setTemplate('CeresCoconut::MyAccount.MyAccountView');
+                $container->setTemplate('CeresCoconutMTG::MyAccount.MyAccountView');
                 return false;
             }, self::PRIORITY);
         }
@@ -213,11 +213,11 @@ class CeresCoconutServiceProvider extends ServiceProvider
         {
             // $dispatcher->listen('IO.tpl.wish-list', function (TemplateContainer $container)
             // {
-            //     $container->setTemplate('CeresCoconut::WishList.WishListView');
+            //     $container->setTemplate('CeresCoconutMTG::WishList.WishListView');
             //     return false;
             // }, self::PRIORITY);
             $dispatcher->listen("IO.Resources.Import", function(ResourceContainer $container){
-                $container->addScriptTemplate('CeresCoconut::WishList.Components.WishListItem');
+                $container->addScriptTemplate('CeresCoconutMTG::WishList.Components.WishListItem');
             },self::PRIORITY);
         }
 
@@ -227,7 +227,7 @@ class CeresCoconutServiceProvider extends ServiceProvider
 
             $dispatcher->listen('IO.tpl.contact', function (TemplateContainer $container)
             {
-                $container->setTemplate('CeresCoconut::Customer.Contact');
+                $container->setTemplate('CeresCoconutMTG::Customer.Contact');
                 return false;
             }, self::PRIORITY);
         }
@@ -238,7 +238,7 @@ class CeresCoconutServiceProvider extends ServiceProvider
 
             $dispatcher->listen('IO.tpl.order.return', function (TemplateContainer $container)
             {
-                $container->setTemplate('CeresCoconut::OrderReturn.OrderReturnView');
+                $container->setTemplate('CeresCoconutMTG::OrderReturn.OrderReturnView');
                 return false;
             }, self::PRIORITY);
         }
@@ -249,7 +249,7 @@ class CeresCoconutServiceProvider extends ServiceProvider
 
             $dispatcher->listen('IO.tpl.order.return.confirmation', function (TemplateContainer $container)
             {
-                $container->setTemplate('CeresCoconut::OrderReturn.OrderReturnConfirmation');
+                $container->setTemplate('CeresCoconutMTG::OrderReturn.OrderReturnConfirmation');
                 return false;
             }, self::PRIORITY);
         }
@@ -260,7 +260,7 @@ class CeresCoconutServiceProvider extends ServiceProvider
 
             $dispatcher->listen('IO.tpl.cancellation-rights', function (TemplateContainer $container)
             {
-                $container->setTemplate('CeresCoconut::StaticPages.CancellationRights');
+                $container->setTemplate('CeresCoconutMTG::StaticPages.CancellationRights');
                 return false;
             }, self::PRIORITY);
         }
@@ -271,7 +271,7 @@ class CeresCoconutServiceProvider extends ServiceProvider
 
             $dispatcher->listen('IO.tpl.cancellation-form', function (TemplateContainer $container)
             {
-                $container->setTemplate('CeresCoconut::StaticPages.CancellationForm');
+                $container->setTemplate('CeresCoconutMTG::StaticPages.CancellationForm');
                 return false;
             }, self::PRIORITY);
         }
@@ -282,7 +282,7 @@ class CeresCoconutServiceProvider extends ServiceProvider
 
             $dispatcher->listen('IO.tpl.legal-disclosure', function (TemplateContainer $container)
             {
-                $container->setTemplate('CeresCoconut::StaticPages.LegalDisclosure');
+                $container->setTemplate('CeresCoconutMTG::StaticPages.LegalDisclosure');
                 return false;
             }, self::PRIORITY);
         }
@@ -293,7 +293,7 @@ class CeresCoconutServiceProvider extends ServiceProvider
 
             $dispatcher->listen('IO.tpl.privacy-policy', function (TemplateContainer $container)
             {
-                $container->setTemplate('CeresCoconut::StaticPages.PrivacyPolicy');
+                $container->setTemplate('CeresCoconutMTG::StaticPages.PrivacyPolicy');
                 return false;
             }, self::PRIORITY);
         }
@@ -304,7 +304,7 @@ class CeresCoconutServiceProvider extends ServiceProvider
 
             $dispatcher->listen('IO.tpl.terms-conditions', function (TemplateContainer $container)
             {
-                $container->setTemplate('CeresCoconut::StaticPages.TermsAndConditions');
+                $container->setTemplate('CeresCoconutMTG::StaticPages.TermsAndConditions');
                 return false;
             }, self::PRIORITY);
         }
@@ -315,7 +315,7 @@ class CeresCoconutServiceProvider extends ServiceProvider
 
             $dispatcher->listen('IO.tpl.item-not-found', function (TemplateContainer $container)
             {
-                $container->setTemplate('CeresCoconut::StaticPages.ItemNotFound');
+                $container->setTemplate('CeresCoconutMTG::StaticPages.ItemNotFound');
                 return false;
             }, self::PRIORITY);
         }
@@ -326,7 +326,7 @@ class CeresCoconutServiceProvider extends ServiceProvider
 
             $dispatcher->listen('IO.tpl.page-not-found', function (TemplateContainer $container)
             {
-                $container->setTemplate('CeresCoconut::StaticPages.PageNotFound');
+                $container->setTemplate('CeresCoconutMTG::StaticPages.PageNotFound');
                 return false;
             }, self::PRIORITY);
         }
@@ -337,16 +337,16 @@ class CeresCoconutServiceProvider extends ServiceProvider
 
             $dispatcher->listen('IO.tpl.newsletter.opt-out', function (TemplateContainer $container)
             {
-                $container->setTemplate('CeresCoconut::Newsletter.NewsletterOptOut');
+                $container->setTemplate('CeresCoconutMTG::Newsletter.NewsletterOptOut');
                 return false;
             }, self::PRIORITY);
         }
 
         $enabledResultFields = [];
 
-        if(!empty($config->get("CeresCoconut.result_fields.override")))
+        if(!empty($config->get("CeresCoconutMTG.result_fields.override")))
         {
-            $enabledResultFields = explode(", ", $config->get("CeresCoconut.result_fields.override"));
+            $enabledResultFields = explode(", ", $config->get("CeresCoconutMTG.result_fields.override"));
         }
 
         if(!empty($enabledResultFields))
@@ -358,31 +358,31 @@ class CeresCoconutServiceProvider extends ServiceProvider
                 // Override list item result fields
                 if (in_array("list_item", $enabledResultFields) || in_array("all", $enabledResultFields))
                 {
-                    $templatesToOverride[ResultFieldTemplate::TEMPLATE_LIST_ITEM] = 'CeresCoconut::ResultFields.ListItem';
+                    $templatesToOverride[ResultFieldTemplate::TEMPLATE_LIST_ITEM] = 'CeresCoconutMTG::ResultFields.ListItem';
                 }
 
                 // Override single item view result fields
                 if (in_array("single_item", $enabledResultFields) || in_array("all", $enabledResultFields))
                 {
-                    $templatesToOverride[ResultFieldTemplate::TEMPLATE_SINGLE_ITEM] = 'CeresCoconut::ResultFields.SingleItem';
+                    $templatesToOverride[ResultFieldTemplate::TEMPLATE_SINGLE_ITEM] = 'CeresCoconutMTG::ResultFields.SingleItem';
                 }
 
                 // Override basket item result fields
                 if (in_array("basket_item", $enabledResultFields) || in_array("all", $enabledResultFields))
                 {
-                    $templatesToOverride[ResultFieldTemplate::TEMPLATE_BASKET_ITEM] = 'CeresCoconut::ResultFields.BasketItem';
+                    $templatesToOverride[ResultFieldTemplate::TEMPLATE_BASKET_ITEM] = 'CeresCoconutMTG::ResultFields.BasketItem';
                 }
 
                 // Override auto complete list item result fields
                 if (in_array("auto_complete_list_item", $enabledResultFields) || in_array("all", $enabledResultFields))
                 {
-                    $templatesToOverride[ResultFieldTemplate::TEMPLATE_AUTOCOMPLETE_ITEM_LIST] = 'CeresCoconut::ResultFields.AutoCompleteListItem';
+                    $templatesToOverride[ResultFieldTemplate::TEMPLATE_AUTOCOMPLETE_ITEM_LIST] = 'CeresCoconutMTG::ResultFields.AutoCompleteListItem';
                 }
 
                 // Override category tree result fields
                 if (in_array("category_tree", $enabledResultFields) || in_array("all", $enabledResultFields))
                 {
-                    $templatesToOverride[ResultFieldTemplate::TEMPLATE_CATEGORY_TREE] = 'CeresCoconut::ResultFields.CategoryTree';
+                    $templatesToOverride[ResultFieldTemplate::TEMPLATE_CATEGORY_TREE] = 'CeresCoconutMTG::ResultFields.CategoryTree';
                 }
 
                 $templateContainer->setTemplates($templatesToOverride);

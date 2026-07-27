@@ -1,5 +1,5 @@
 <?php
-namespace CeresCoconut\Widgets;
+namespace CeresCoconutMTG\Widgets;
 
 // Hier laden wir den offiziellen Widget-Vertrag von Plentymarkets
 use Plenty\Modules\ShopBuilder\Contracts\DynamicWidget;
@@ -34,12 +34,12 @@ class CustomItemImageCarouselWidget implements DynamicWidget
     // 3. Ansicht im ShopBuilder
     public function getPreview($widgetSettings = [], $children = []): string
     {
-        return $this->twig->render('CeresCoconut::Widgets.CustomItemImageCarouselWidget');
+        return $this->twig->render('CeresCoconutMTG::Widgets.CustomItemImageCarouselWidget');
     }
 
     // 4. Ansicht live im Shop
     public function render($widgetSettings = [], $children = []): string
     {
-        return $this->twig->render('CeresCoconut::Widgets.CustomItemImageCarouselWidget');
+        return $this->twig->render('CeresCoconutMTG::Widgets.CustomItemImageCarouselWidget');
     }
 }

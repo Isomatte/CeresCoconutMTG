@@ -1,10 +1,10 @@
-# Release Notes für CeresCoconut
+# Release Notes für CeresCoconutMTG
 
 ## v1.0.7 (2019-05-02)
 
 ### TODO
 
-- Sichere alle Änderungen, die in CeresCoconut vorgenommen wurden, bevor du das Plugin aktualisierst. Alle Änderungen werden beim Update-Prozess zurückgesetzt.
+- Sichere alle Änderungen, die in CeresCoconutMTG vorgenommen wurden, bevor du das Plugin aktualisierst. Alle Änderungen werden beim Update-Prozess zurückgesetzt.
 
 ### Behoben
 
@@ -14,7 +14,7 @@
 
 ### TODO
 
-- Sichere alle Änderungen, die in CeresCoconut vorgenommen wurden, bevor das Update eingespielt wird. Alle Änderungen werden beim Update-Prozess zurückgesetzt.
+- Sichere alle Änderungen, die in CeresCoconutMTG vorgenommen wurden, bevor das Update eingespielt wird. Alle Änderungen werden beim Update-Prozess zurückgesetzt.
 
 ### Hinzugefügt
 
@@ -28,7 +28,7 @@
 
 ### TODO
 
-- Sichere alle Änderungen, die in CeresCoconut vorgenommen wurden, bevor das Update eingespielt wird. Alle Änderungen werden beim Update-Prozess zurückgesetzt.
+- Sichere alle Änderungen, die in CeresCoconutMTG vorgenommen wurden, bevor das Update eingespielt wird. Alle Änderungen werden beim Update-Prozess zurückgesetzt.
 
 ### Hinzugefügt
 
@@ -38,7 +38,7 @@
 
 ### Behoben
 
-- Ein Fehler führte dazu, dass die Result Fields nicht aus CeresCoconut geladen wurden. Dies wurde behoben.
+- Ein Fehler führte dazu, dass die Result Fields nicht aus CeresCoconutMTG geladen wurden. Dies wurde behoben.
 
 ## v1.0.2 (2019-01-21)
 

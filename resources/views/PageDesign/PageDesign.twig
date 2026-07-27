@@ -61,7 +61,7 @@
         {% embed getPartial('page-metadata') %}{% endembed %}
     {% endblock %}
 
-    {% if config("CeresCoconut.optimizeThirdPartyAssets") == "true" %}
+    {% if config("CeresCoconutMTG.optimizeThirdPartyAssets") == "true" %}
         {% set styleBlacklist = ["WishlistWidgets::Scripts", "Findologic::content.nouislider.noui-css"] %}
         {% for styleTemplate in get_additional_styles() %}
             {% if styleTemplate.path not in styleBlacklist %}
@@ -331,7 +331,7 @@
 <script src="{{ plugin_path('Ceres') }}/js/dist/{{ assetName }}{{ minSuffix }}.js?v={{ buildHash }}"></script>
 <!-- /SSR -->
 
-{% if config("CeresCoconut.optimizeThirdPartyAssets") == "true" %}
+{% if config("CeresCoconutMTG.optimizeThirdPartyAssets") == "true" %}
     {% set scriptBlacklist = ["TrustedShops::VueComponents", "CfourArticleNotifications5::Ajax", "Feedback::Content.Scripts", "GLSShipping::content.momentjs", "AxytosInvoice::Scripts"] %}
     {% for scriptTemplate in get_additional_scripts() %}
         {% if scriptTemplate.path not in scriptBlacklist %}

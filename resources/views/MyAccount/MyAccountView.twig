@@ -8,10 +8,10 @@
 
 {% block PageBody %}
 
-    {{ component( "CeresCoconut::Customer.Components.AddressSelect.AddressSelect" ) }}
+    {{ component( "CeresCoconutMTG::Customer.Components.AddressSelect.AddressSelect" ) }}
     {{ component( "Ceres::MyAccount.Components.AccountSettings" ) }}
-    {{ component( "CeresCoconut::MyAccount.Components.History" ) }}
-    {{ component( "CeresCoconut::MyAccount.Components.BankDataSelect" ) }}
+    {{ component( "CeresCoconutMTG::MyAccount.Components.History" ) }}
+    {{ component( "CeresCoconutMTG::MyAccount.Components.BankDataSelect" ) }}
 
     {% set userObject = services.customer.getContact() %}
     {% set userBankData = services.contactBank.getBanksOfContact(frontend.Account.AccountContactId) %}
