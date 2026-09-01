@@ -32,7 +32,17 @@ class CancellationFormWidget implements DynamicWidget
         return [
             'identifier' => 'cancellationForm',
             'label' => 'Widerrufsformular (Theme)',
-            'categories' => ['form', 'contact']
+
+            // Ohne 'type' taucht das Widget in der ShopBuilder-Liste nicht auf: die
+            // Container einer Inhaltsseite erlauben bestimmte Widget-Typen, und ein
+            // Widget ohne Typ passt zu keinem davon.
+            // Entspricht Ceres\Widgets\Helper\WidgetTypes::DEFAULT.
+            'type' => 'default',
+
+            // Entspricht Ceres\Widgets\Helper\WidgetCategories::FORM bzw. CONTACT.
+            'categories' => ['form', 'contact'],
+            'position' => 100,
+            'keywords' => ['widerruf', 'widerrufsformular', 'cancellation', 'formular', 'form']
         ];
     }
 
