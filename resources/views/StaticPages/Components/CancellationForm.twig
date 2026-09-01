@@ -1,0 +1,131 @@
+{# Widerrufsformular des Themes.
+
+   Postet auf den eigenen Endpunkt /rest/cerescoconutmtg/cancellation
+   (CeresCoconutMTG\Controllers\CancellationFormController), damit die Mail an den
+   Shop einen Reply-To-Header auf die Kontakt-E-Mail des Kunden bekommt. Der
+   Core-Endpunkt /rest/io/cancellation des Ceres-Formular-Widgets tut das nicht.
+
+   Das Markup nutzt bewusst die Ceres-Klassen (.widget-contact-form, .input-unit),
+   damit die vorhandenen Theme-Styles greifen. Die Logik liegt in
+   resources/js/cancellation-form.js und bindet per Event-Delegation, weil Vue das
+   Markup beim Mounten neu rendert und direkt gesetzte Listener verlieren wuerde. #}
+
+{% set formId = uid() %}
+{# Die Plugin-Konfiguration liefert je nach Speicherstand bool oder String zurueck.
+   Ein loses "in [true, 'true']" waere hier falsch, weil auch der String 'false' zu
+   true casten wuerde. #}
+{% set customerCopyRaw = config('CeresCoconutMTG.cancellation.customerCopy') %}
+{% set customerCopy = customerCopyRaw is same as(true) or customerCopyRaw == 'true' or customerCopyRaw == '1' %}
+
+<div class="widget widget-contact-form mtg-cancellation-form">
+    <div class="widget-inner">
+
+        <div class="alert alert-success d-none" role="status" data-mtg-cancellation-success>
+            <strong>{{ trans('CeresCoconutMTG::Template.cancellationSuccessTitle') }}</strong>
+            <p class="mb-0 mt-2" data-mtg-cancellation-success-text></p>
+        </div>
+
+        <form class="row" id="mtg-cancellation-{{ formId }}" method="post" novalidate
+              data-mtg-cancellation-form
+              data-customer-copy="{{ customerCopy ? '1' : '0' }}"
+              data-msg-required="{{ trans('CeresCoconutMTG::Template.cancellationErrorRequired') }}"
+              data-msg-email="{{ trans('CeresCoconutMTG::Template.cancellationErrorMail') }}"
+              data-msg-failed="{{ trans('CeresCoconutMTG::Template.cancellationErrorFailed') }}"
+              data-msg-toofast="{{ trans('CeresCoconutMTG::Template.cancellationErrorTooFast') }}"
+              data-msg-success="{{ trans('CeresCoconutMTG::Template.cancellationSuccessText') }}"
+              data-msg-successcopy="{{ trans('CeresCoconutMTG::Template.cancellationSuccessCopy') }}">
+
+            <div class="col-12">
+                <div class="alert alert-danger d-none" role="alert" data-mtg-cancellation-error></div>
+            </div>
+
+            <div class="col-12 cmp-contact">
+
+                <div class="widget widget-text-input">
+                    <div class="input-unit required">
+                        <input type="text" name="name" id="mtg-cf-name-{{ formId }}" autocomplete="name"
+                               placeholder="{{ trans('CeresCoconutMTG::Template.cancellationFieldName') }}">
+                        <label for="mtg-cf-name-{{ formId }}">{{ trans('CeresCoconutMTG::Template.cancellationFieldName') }}*</label>
+                    </div>
+                </div>
+
+                <div class="widget widget-text-area">
+                    <div class="input-unit textarea">
+                        <textarea name="address" id="mtg-cf-address-{{ formId }}" rows="3" autocomplete="street-address"
+                                  placeholder="{{ trans('CeresCoconutMTG::Template.cancellationFieldAddress') }}"></textarea>
+                        <label for="mtg-cf-address-{{ formId }}">{{ trans('CeresCoconutMTG::Template.cancellationFieldAddress') }}</label>
+                    </div>
+                </div>
+
+                <div class="widget widget-text-input">
+                    <div class="input-unit required">
+                        <input type="text" name="order" id="mtg-cf-order-{{ formId }}"
+                               placeholder="{{ trans('CeresCoconutMTG::Template.cancellationFieldOrder') }}">
+                        <label for="mtg-cf-order-{{ formId }}">{{ trans('CeresCoconutMTG::Template.cancellationFieldOrder') }}*</label>
+                    </div>
+                </div>
+
+                <div class="widget widget-mail-input">
+                    <div class="input-unit required">
+                        <input type="email" name="email" id="mtg-cf-email-{{ formId }}" autocomplete="email"
+                               placeholder="{{ trans('CeresCoconutMTG::Template.cancellationFieldEmail') }}">
+                        <label for="mtg-cf-email-{{ formId }}">{{ trans('CeresCoconutMTG::Template.cancellationFieldEmail') }}*</label>
+                    </div>
+                    <small class="form-text text-muted">{{ trans('CeresCoconutMTG::Template.cancellationFieldEmailHint') }}</small>
+                </div>
+
+                <div class="widget widget-grid widget-two-col row">
+                    <div class="widget-inner col-12 col-md-6">
+                        <div class="widget widget-text-input">
+                            <div class="input-unit">
+                                <input type="text" name="orderedAt" id="mtg-cf-ordered-{{ formId }}"
+                                       placeholder="{{ trans('CeresCoconutMTG::Template.cancellationDatePlaceholder') }}">
+                                <label for="mtg-cf-ordered-{{ formId }}">{{ trans('CeresCoconutMTG::Template.cancellationFieldOrderedAt') }}</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="widget-inner col-12 col-md-6">
+                        <div class="widget widget-text-input">
+                            <div class="input-unit">
+                                <input type="text" name="receivedAt" id="mtg-cf-received-{{ formId }}"
+                                       placeholder="{{ trans('CeresCoconutMTG::Template.cancellationDatePlaceholder') }}">
+                                <label for="mtg-cf-received-{{ formId }}">{{ trans('CeresCoconutMTG::Template.cancellationFieldReceivedAt') }}</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="widget widget-text-area mt-3 contact-form-message">
+                    <div class="input-unit textarea">
+                        <textarea name="reason" id="mtg-cf-reason-{{ formId }}" rows="8" class="no-resize"
+                                  placeholder="{{ trans('CeresCoconutMTG::Template.cancellationFieldReason') }}"></textarea>
+                        <label for="mtg-cf-reason-{{ formId }}">{{ trans('CeresCoconutMTG::Template.cancellationFieldReason') }}</label>
+                    </div>
+                </div>
+
+                <div class="widget widget-text mt-3">
+                    <p class="small mb-0">
+                        {{ trans('CeresCoconutMTG::Template.cancellationPrivacyHint') }}
+                        <a href="{{ urls.privacyPolicy }}" target="_blank" rel="noopener">{{ trans('CeresCoconutMTG::Template.cancellationPrivacyLink') }}</a>
+                    </p>
+                </div>
+
+            </div>
+
+            {# Honeypot: fuer Nutzer unsichtbar, Bots fuellen ihn aus. #}
+            <input type="text" name="username" id="mtg-cf-honey-{{ formId }}" class="honey"
+                   autocomplete="new-password" aria-hidden="true" tabindex="-1">
+            <label class="position-absolute" for="mtg-cf-honey-{{ formId }}">
+                <span class="visually-hidden">{{ trans('CeresCoconutMTG::Template.cancellationHoneypotLabel') }}</span>
+            </label>
+
+            <div class="col-12 text-right">
+                <button type="submit" class="btn btn-primary" data-mtg-cancellation-submit>
+                    <span data-mtg-cancellation-submit-label>{{ trans('CeresCoconutMTG::Template.cancellationSubmit') }}</span>
+                    <i class="fa fa-paper-plane-o ml-2" aria-hidden="true"></i>
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>

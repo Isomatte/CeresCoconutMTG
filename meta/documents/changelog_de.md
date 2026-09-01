@@ -1,5 +1,14 @@
 # Release Notes für CeresCoconutMTG
 
+## v1.0.8 (2026-09-01)
+
+### Hinzugefügt
+
+- Eigenes Widerrufsformular im Theme inklusive REST-Endpunkt `/rest/cerescoconutmtg/cancellation`. Die Mail an den Shop bekommt jetzt einen Reply-To-Header auf die Kontakt-E-Mail des Kunden, eine Antwort geht also direkt an ihn.
+- Optionale Eingangsbestätigung an den Kunden mit Datum und Uhrzeit (§ 356 Abs. 1 Satz 2 BGB).
+- Neuer Konfigurationstab "Widerrufsformular" für Empfängeradresse, Betreff und Eingangsbestätigung.
+- ShopBuilder-Widget "Widerrufsformular (Theme)" als Alternative zur statischen Seite.
+
 ## v1.0.7 (2019-05-02)
 
 ### TODO

@@ -13,6 +13,8 @@ use Plenty\Plugin\ConfigRepository;
 use Plenty\Modules\Webshop\Template\Providers\TemplateServiceProvider;
 use Plenty\Modules\ShopBuilder\Contracts\ContentWidgetRepositoryContract;
 use CeresCoconutMTG\Widgets\CustomItemImageCarouselWidget;
+use CeresCoconutMTG\Widgets\CancellationFormWidget;
+use CeresCoconutMTG\Providers\CeresCoconutMTGRouteServiceProvider;
 
 
 /**
@@ -25,7 +27,8 @@ class CeresCoconutMTGServiceProvider extends ServiceProvider
 
     public function register()
     {
-
+        // Eigener Endpunkt fuer das Widerrufsformular (/rest/cerescoconutmtg/cancellation).
+        $this->getApplication()->register(CeresCoconutMTGRouteServiceProvider::class);
     }
 
 
@@ -389,5 +392,6 @@ class CeresCoconutMTGServiceProvider extends ServiceProvider
             }, self::PRIORITY);
         }
 		$widgetRepository->registerWidget(CustomItemImageCarouselWidget::class);
+        $widgetRepository->registerWidget(CancellationFormWidget::class);
     }
 }

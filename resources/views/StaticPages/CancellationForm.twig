@@ -1,1 +1,51 @@
-<!-- Insert markup here -->
+{# Widerrufsformular-Seite ohne ShopBuilder.
+
+   Wird verwendet, sobald in der Plugin-Konfiguration unter "Partials und Templates
+   überschreiben" der Eintrag "Widerrufsformular" aktiviert ist UND die Route
+   /widerrufsformular/ nicht mehr auf eine ShopBuilder-Inhaltskategorie zeigt.
+   Alternativ laesst sich dasselbe Formular ueber das Widget
+   "Widerrufsformular (Theme)" in eine bestehende ShopBuilder-Seite legen. #}
+
+{% extends getPartial('page-design') %}
+
+{% block PartialHead %}
+    <meta name="description" content="{{ trans('Ceres::Template.cancellationFormMetaDescription') }}">
+    <meta name="robots" content="{{ config('Ceres.meta.robots_cancel_form') }}">
+    <title class="d-print-none">{{ trans('Ceres::Template.cancellationForm', {"hyphen": ""}) }} | {{ trans('Ceres::Template.headerCompanyName') }}</title>
+{% endblock %}
+
+{% block PageBody %}
+
+    {% set withdrawalForm = services.legalInformation.getWithdrawalForm() %}
+
+    <div class="container-max page-content">
+        <div class="row">
+            <div class="col-12 mb-5">
+                {% autoescape false %}
+                    <h1 class="pt-3">{{ trans('Ceres::Template.cancellationForm', {"hyphen": "&shy;"}) }}</h1>
+                {% endautoescape %}
+
+                <hr class="my-5">
+
+                {# Rechtstext aus Einrichtung » Mandant » Rechtliches » Widerrufsformular #}
+                {% if withdrawalForm.htmlText %}
+                    {{ withdrawalForm.htmlText | raw }}
+                {% elseif withdrawalForm.plainText %}
+                    <p>{{ withdrawalForm.plainText }}</p>
+                {% endif %}
+
+                {% include "CeresCoconutMTG::StaticPages.Components.CancellationForm" %}
+
+                <hr class="my-5 d-print-none">
+
+                <div class="col-12 col-md-12 px-0 d-print-none">
+                    <button type="button" class="btn btn-primary btn-medium float-right" onclick="window.print()">
+                        <i class="fa fa-print" aria-hidden="true"></i>
+                        {{ trans('Ceres::Template.cancellationFormPrint') }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

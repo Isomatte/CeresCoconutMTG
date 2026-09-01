@@ -132,6 +132,38 @@
                 }
             }
         },
+        "Config.CancellationTab": {
+            "label": "Config.CancellationTab",
+            "formFields": {
+                "cancellation.recipient": {
+                    "type": "text",
+                    "required": true,
+                    "label": "Config.cancellationRecipientLabel",
+                    "options": {
+                        "defaultValue": "verkauf@mein-tuergriff.de",
+                        "tooltip": "Config.cancellationRecipientTooltip"
+                    }
+                },
+                "cancellation.subject": {
+                    "type": "text",
+                    "required": false,
+                    "label": "Config.cancellationSubjectLabel",
+                    "options": {
+                        "defaultValue": "Widerruf",
+                        "tooltip": "Config.cancellationSubjectTooltip"
+                    }
+                },
+                "cancellation.customerCopy": {
+                    "type": "checkBox",
+                    "required": false,
+                    "label": "Config.cancellationCustomerCopyLabel",
+                    "options": {
+                        "defaultValue": "true",
+                        "tooltip": "Config.cancellationCustomerCopyTooltip"
+                    }
+                }
+            }
+        },
         "Config.ResultFieldsTab": {
             "label": "Config.ResultFieldsTab",
             "formFields": {

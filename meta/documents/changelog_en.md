@@ -1,5 +1,14 @@
 # Release Notes for CeresCoconutMTG
 
+## v1.0.8 (2026-09-01)
+
+### Added
+
+- Own cancellation form in the theme including the REST endpoint `/rest/cerescoconutmtg/cancellation`. The mail to the shop now carries a reply-to header pointing at the customer's contact email, so replying reaches the customer.
+- Optional confirmation of receipt for the customer including date and time.
+- New configuration tab "Cancellation form" for recipient address, subject and confirmation of receipt.
+- ShopBuilder widget "Cancellation form (theme)" as an alternative to the static page.
+
 ## v1.0.7 (2019-05-02)
 
 ### TODO
