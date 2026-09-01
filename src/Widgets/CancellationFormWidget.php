@@ -30,7 +30,9 @@ class CancellationFormWidget implements DynamicWidget
     public function getData(): array
     {
         return [
-            'identifier' => 'cancellationForm',
+            // Der Identifier MUSS den Plugin-Namespace enthalten. Ohne Praefix ordnet der
+            // ShopBuilder das Widget keinem Plugin zu und bietet es gar nicht erst an.
+            'identifier' => 'CeresCoconutMTG::CancellationFormWidget',
             'label' => 'Widerrufsformular (Theme)',
 
             // Ohne 'type' taucht das Widget in der ShopBuilder-Liste nicht auf: die

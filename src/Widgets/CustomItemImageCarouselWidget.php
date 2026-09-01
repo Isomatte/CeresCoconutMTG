@@ -19,9 +19,14 @@ class CustomItemImageCarouselWidget implements DynamicWidget
     public function getData(): array
     {
         return [
-            'identifier' => 'customItemImageCarousel',
+            // Der Identifier muss den Plugin-Namespace enthalten, sonst taucht das
+            // Widget nicht in der ShopBuilder-Liste auf. Deshalb wurde das Karussell
+            // bisher per Markup <custom-item-image-carousel> eingebunden.
+            'identifier' => 'CeresCoconutMTG::CustomItemImageCarouselWidget',
             'label'      => 'Custom 360° Bilderkarussell',
-            'categories' => ['item'] 
+            'type'       => 'default',
+            'categories' => ['item'],
+            'position'   => 100
         ];
     }
 
