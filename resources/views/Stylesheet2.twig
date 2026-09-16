@@ -151,7 +151,8 @@
 </style>
 
 
-<link rel="stylesheet" href="{{ plugin_path('CeresCoconutMTG') }}/css/main.min.css">
+{# ?v=buildHash: Cache-Buster fuer CDN/Browser, aendert sich bei jedem Plugin-Set-Deploy (wie bei den Ceres-Assets) #}
+<link rel="stylesheet" href="{{ plugin_path('CeresCoconutMTG') }}/css/main.min.css?v={{ buildHash|default('20260916') }}">
 {#<link rel="stylesheet" href="{{ plugin_path('CeresCoconutMTG') }}/css/fonts.css">#}
 
 {% endif %}
