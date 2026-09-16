@@ -724,6 +724,9 @@ header .search-box #searchBox{
     display: -webkit-box;
     display: -ms-flexbox;
     display: flex;
+    /* Ceres' .megamenu .collapse setzt overflow-y:hidden und wuerde das
+       Autocomplete-Dropdown abschneiden */
+    overflow: visible;
 }
 header .search-box #searchBox .container-max{
     padding:0px;
@@ -775,12 +778,16 @@ header .search-box #searchBox .container-max > div > div:not(.autosuggest-wrappe
     header .search-box{
         display: block;
     }
+    /* Wie in Ceres absolut unter dem Suchfeld positionieren (statt fixed mit
+       hart kodiertem top), damit das Dropdown dem Suchfeld folgt, wenn oberhalb
+       z.B. der Aktionsbanner eingeblendet wird. calc(100% - .5rem) hebt den
+       mb-2 des Suchfeld-Rows auf, damit das Dropdown direkt am Feld anliegt. */
     .autocomplete-suggestions{
-        position: fixed;
+        position: absolute;
         width: 350px!important;
         border-radius: 5px;
         border: 2px solid #DEE2E4;
-        top: 120px;
+        top: calc(100% - .5rem);
     }
     header .search-box #searchBox .container-max > div > div.autocomplete-suggestions{
         height: auto;
