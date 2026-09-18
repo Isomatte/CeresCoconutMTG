@@ -4646,3 +4646,20 @@ header .pre-top {
 .cmp-product-thumb .thumb-content {
     padding: 0;
 }
+
+
+/* CLS: ShopBuilder-Bildboxen "Seitenverhaeltnis beibehalten" in 1:1-Grids
+   (Unterkategorie-Kacheln auf Kategorieseiten, z.B. /tuergriffe/innentueren/).
+   Das Bild laedt lazy ohne width/height; erst nach dem Laden bekommt es von
+   lozad die Klasse img-cover (min-width:100%) und rendert quadratisch auf
+   Spaltenbreite. Vorher ist es 0x0, Ceres reserviert keine Hoehe (widget-prop-md-*
+   greift erst ab 768px, widget-retain-aspect-ratio schaltet die min-height ab).
+   Daher die quadratische Box auf Spaltenbreite vorab reservieren - identisch zum
+   geladenen Zustand, also keine Layout-Verschiebung. object-fit: contain faengt
+   abweichende Bildformate ohne Verzerrung ab. */
+.widget-inner[class*="widget-prop-md-1-1"] .widget-image-box.widget-retain-aspect-ratio img{
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    -o-object-fit: contain;
+       object-fit: contain;
+}
