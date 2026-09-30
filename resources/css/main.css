@@ -19,7 +19,13 @@ html{
     margin-top: 5px;
 }
 
-#page-header-parent, #page-header-parent .navbar.header-fw {
+/* Header/Mega-Menue muss ueber der angedockten Kaufbox liegen: Ceres setzt
+   .sticky-element.is-sticky beim Scrollen auf position:fixed + z-index:1020.
+   Unter Cookie-Bar (1030), Modals (1050) und Notifications (10001). */
+#page-header-parent {
+    z-index: 1025;
+}
+#page-header-parent .navbar.header-fw {
     z-index: 1;
 }
 
