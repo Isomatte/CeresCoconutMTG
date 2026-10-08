@@ -87,10 +87,20 @@ class ShipmentTrackingController extends Controller
      */
     private function render(Twig $twig, array $tracking, int $status = 200): Response
     {
+        // assetName und bodyClasses setzt Ceres nur bei seinen eigenen Seiten. Ohne
+        // assetName faellt Ceres auf das Checkout-Paket zurueck und Stylesheet2.twig
+        // laedt main.min.css nicht (Fonts, Header und Footer des Themes fehlen dann).
+        // Werte wie bei den Inhaltsseiten (Impressum, Widerrufsformular).
+        $templateData = [
+            'tracking' => $tracking,
+            'assetName' => 'ceres-base',
+            'bodyClasses' => ['page-category-content', 'page-category', 'page-shipment-tracking']
+        ];
+
         // Die Seite enthaelt Bestelldaten: nicht im Seiten-Cache oder bei Proxys ablegen
         // und nicht indexieren.
         return $this->response->make(
-            $twig->render(self::TEMPLATE, ['tracking' => $tracking]),
+            $twig->render(self::TEMPLATE, $templateData),
             $status,
             [
                 'Cache-Control' => 'no-store, private',

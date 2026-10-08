@@ -24,6 +24,7 @@
     <div class="container-max page-content mtg-tracking">
         <div class="mtg-tracking__main" v-pre>
             <h1 class="mtg-tracking__title">{{ trans('CeresCoconutMTG::Template.trackingTitle') }}</h1>
+            <span class="mtg-tracking__kicker">{{ trans('CeresCoconutMTG::Template.trackingKicker') }}</span>
 
             {% if tracking.result == "found" %}
                 {% include "CeresCoconutMTG::ShipmentTracking.Partials.Result" %}

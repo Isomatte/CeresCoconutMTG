@@ -23,16 +23,18 @@
 .mtg-tracking__main a:not(.btn) { color: var(--mtg-accent-dark); }
 .mtg-tracking__main a:not(.btn):hover { color: var(--mtg-accent); }
 
-.mtg-tracking__title { position: relative; margin: 24px 0 20px; padding-bottom: 12px; overflow-wrap: break-word; hyphens: auto; }
-.mtg-tracking__title::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    width: 56px;
-    height: 4px;
-    border-radius: 2px;
-    background: var(--mtg-accent);
+/* Seitenkopf wie auf den Kategorieseiten: grosser Titel, darunter orange Unterzeile.
+   Schrift, Grossschreibung und Laufweite kommen aus main.min.css (h1-h4). */
+.mtg-tracking__title { margin: 24px 0 4px; font-size: 30px; line-height: 1.15; overflow-wrap: break-word; }
+.mtg-tracking__kicker {
+    display: block;
+    margin: 0 0 20px;
+    font-family: 'Space Grotesk', Helvetica, Arial, sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 1.3px;
+    text-transform: uppercase;
+    color: var(--mtg-accent);
 }
 .mtg-tracking__lead { font-size: 1.05rem; margin-bottom: 20px; }
 .mtg-tracking__hint { font-size: 13px; color: var(--mtg-muted); margin: -6px 0 14px; }
@@ -98,9 +100,10 @@
     text-transform: uppercase;
     color: var(--mtg-accent-dark);
 }
-.mtg-tracking__headline { font-size: 1.5rem; margin: 0 0 4px; }
+/* h2/h3 sind im Theme 50/34 px gross, hier bewusst kleiner. */
+.mtg-tracking__headline { font-size: 22px; line-height: 1.25; margin: 0 0 6px; }
 .mtg-tracking__text { margin: 0 0 4px; }
-.mtg-tracking__subheadline { font-size: 1rem; font-weight: 700; margin: 20px 0 10px; }
+.mtg-tracking__subheadline { font-size: 15px; line-height: 1.3; font-weight: 700; margin: 20px 0 10px; color: var(--mtg-accent-dark); }
 .mtg-tracking__subheadline .fa { color: var(--mtg-accent); margin-right: 6px; }
 
 .mtg-tracking__number { display: flex; flex-wrap: wrap; gap: 4px 8px; margin: 16px 0 0; font-size: 14px; }
@@ -195,10 +198,15 @@
 .mtg-timeline__where { display: block; font-size: 13px; color: var(--mtg-muted); }
 .mtg-timeline__more summary { margin: 0 0 12px; font-size: 14px; font-weight: 700; color: var(--mtg-accent-dark); cursor: pointer; }
 
+@media (min-width: 1200px) {
+    .mtg-tracking__title { font-size: 50px; line-height: 55px; }
+}
+
 @media (max-width: 575.98px) {
-    .mtg-tracking__title { font-size: 1.75rem; }
+    .mtg-tracking__title { font-size: 26px; }
+    .mtg-tracking__kicker { font-size: 16px; }
     .mtg-tracking__card { padding: 16px; }
-    .mtg-tracking__headline { font-size: 1.25rem; }
+    .mtg-tracking__headline { font-size: 18px; }
     .mtg-tracking__benefits { padding: 16px; }
     .mtg-steps__step::before { top: 14px; }
     .mtg-steps__icon { width: 30px; height: 30px; border-width: 2px; font-size: 13px; }
