@@ -551,15 +551,16 @@ class TrackingNormalizer
 
     /**
      * Ersten Buchstaben gross schreiben, auch bei Umlauten. strtoupper kennt nur ASCII,
-     * mb_strtoupper ist im Plugin-Code nicht erlaubt.
+     * mb_strtoupper und strtr sind im Plugin-Code nicht erlaubt.
      *
      * @param string $text
      * @return string
      */
     private function upperFirst(string $text): string
     {
-        $first = strtr(mb_substr($text, 0, 1, 'UTF-8'), self::UPPER_UMLAUTS);
+        $first = mb_substr($text, 0, 1, 'UTF-8');
+        $first = self::UPPER_UMLAUTS[$first] ?? strtoupper($first);
 
-        return strtoupper($first) . mb_substr($text, 1, null, 'UTF-8');
+        return $first . mb_substr($text, 1, null, 'UTF-8');
     }
 }

@@ -122,7 +122,11 @@ class ShipmentTrackingService
             /** @var ItemListService $itemListService */
             $itemListService = pluginApp(ItemListService::class);
 
-            foreach (array_slice($orderedItemIds, 0, self::MAX_RECOMMENDATION_SOURCES) as $itemId) {
+            foreach ($orderedItemIds as $sourceIndex => $itemId) {
+                if ($sourceIndex >= self::MAX_RECOMMENDATION_SOURCES) {
+                    break;
+                }
+
                 $result = $itemListService->getItemList('cross_selling', $itemId, 'sorting.price.avg_asc', self::MAX_RECOMMENDATIONS, 'Accessory');
 
                 foreach ($result['documents'] ?? [] as $document) {
@@ -273,7 +277,7 @@ class ShipmentTrackingService
             'status' => $this->getOrderStatus((float)$order->statusId),
             'stage' => $this->getOrderStage((float)$order->statusId, $packages),
             'items' => $items,
-            'itemIds' => array_values(array_unique(array_filter(array_values($itemIds)))),
+            'itemIds' => $this->uniqueItemIds($itemIds),
             'packages' => $packages
         ];
     }
@@ -320,7 +324,14 @@ class ShipmentTrackingService
                 : TrackingNormalizer::STAGE_ORDERED;
         }
 
-        return (int)min(array_column($packages, 'stage'));
+        $stage = TrackingNormalizer::STAGE_DELIVERED;
+        foreach ($packages as $package) {
+            if ($package['stage'] < $stage) {
+                $stage = (int)$package['stage'];
+            }
+        }
+
+        return $stage;
     }
 
     /**
@@ -378,7 +389,10 @@ class ShipmentTrackingService
         // UPS-Token gilt 4 Stunden. Mit Puffer speichern, damit es nicht mitten in
         // einer Anfrage ablaeuft.
         if (!empty($result['newToken'])) {
-            $minutes = max(1, (int)floor((int)($result['tokenExpiresIn'] ?? 0) / 60) - 10);
+            $minutes = (int)((int)($result['tokenExpiresIn'] ?? 0) / 60) - 10;
+            if ($minutes < 1) {
+                $minutes = 1;
+            }
             $this->cache->put($tokenKey, (string)$result['newToken'], $minutes);
         }
 
@@ -494,10 +508,10 @@ class ShipmentTrackingService
         }
 
         $name = $preset !== null ? strtoupper((string)$preset->backendName) : '';
-        if (strpos($name, 'UPS') !== false) {
+        if (preg_match('/UPS/', $name)) {
             return TrackingNormalizer::CARRIER_UPS;
         }
-        if (strpos($name, 'DHL') !== false) {
+        if (preg_match('/DHL/', $name)) {
             return TrackingNormalizer::CARRIER_DHL;
         }
 
@@ -579,6 +593,24 @@ class ShipmentTrackingService
         }
 
         return [];
+    }
+
+    /**
+     * Artikel-IDs ohne Doppelte und ohne 0, in Reihenfolge der Bestellung.
+     *
+     * @param array $itemIds variationId => itemId
+     * @return int[]
+     */
+    private function uniqueItemIds(array $itemIds): array
+    {
+        $unique = [];
+        foreach ($itemIds as $itemId) {
+            if ($itemId > 0 && !in_array($itemId, $unique, true)) {
+                $unique[] = $itemId;
+            }
+        }
+
+        return $unique;
     }
 
     /**
