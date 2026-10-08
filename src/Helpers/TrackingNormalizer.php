@@ -52,6 +52,9 @@ class TrackingNormalizer
 
     const WEEKDAYS = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
 
+    /** Fuer upperFirst(): strtoupper wandelt nur ASCII um. */
+    const UPPER_UMLAUTS = ['ä' => 'Ä', 'ö' => 'Ö', 'ü' => 'Ü'];
+
     /** @var string Heutiges Datum (Y-m-d) fuer "heute"/"morgen"-Beschriftungen. */
     private $today;
 
@@ -467,21 +470,23 @@ class TrackingNormalizer
      */
     private function isoDateTime(string $value): array
     {
-        if (!strlen($value)) {
+        // Ohne "new \DateTime": "new" ist im Plugin-Code nicht erlaubt.
+        $value = trim($value);
+        if (!preg_match('/^(\d{4}-\d{2}-\d{2})(?:[T ](\d{2}:\d{2}))?/', $value, $matches)) {
             return ['date' => '', 'time' => ''];
         }
 
-        try {
-            $dateTime = new \DateTime($value, new \DateTimeZone('Europe/Berlin'));
-            $dateTime->setTimezone(new \DateTimeZone('Europe/Berlin'));
-        } catch (\Exception $exception) {
-            return ['date' => '', 'time' => ''];
+        // UTC ("...Z") in Serverzeit umrechnen. Alle anderen Zeitstempel sind schon
+        // Ortszeit des Ereignisses und werden unveraendert uebernommen.
+        if (substr($value, -1) === 'Z' && isset($matches[2])) {
+            $timestamp = strtotime($value);
+            if ($timestamp !== false) {
+                return ['date' => date('Y-m-d', $timestamp), 'time' => date('H:i', $timestamp)];
+            }
         }
 
         // Ohne Uhrzeit im Zeitstempel keine "00:00 Uhr" anzeigen.
-        $hasTime = (bool)preg_match('/T\d{2}:\d{2}/', $value);
-
-        return ['date' => $dateTime->format('Y-m-d'), 'time' => $hasTime ? $dateTime->format('H:i') : ''];
+        return ['date' => $matches[1], 'time' => $matches[2] ?? ''];
     }
 
     /**
@@ -494,8 +499,17 @@ class TrackingNormalizer
     private function formatLocation(string $city, string $countryCode): string
     {
         $city = trim($city);
-        if ($city !== '' && mb_strtoupper($city, 'UTF-8') === $city) {
-            $city = mb_convert_case(mb_strtolower($city, 'UTF-8'), MB_CASE_TITLE, 'UTF-8');
+        if ($this->isAllUpperCase($city)) {
+            $words = explode(' ', mb_strtolower($city, 'UTF-8'));
+            foreach ($words as $wordIndex => $word) {
+                // Doppelnamen wie "Halle-Neustadt"
+                $parts = explode('-', $word);
+                foreach ($parts as $partIndex => $part) {
+                    $parts[$partIndex] = $this->upperFirst($part);
+                }
+                $words[$wordIndex] = implode('-', $parts);
+            }
+            $city = implode(' ', $words);
         }
 
         $countryCode = strtoupper(trim($countryCode));
@@ -516,11 +530,36 @@ class TrackingNormalizer
     {
         $text = trim(preg_replace('/\s+/u', ' ', $text));
 
-        if ($text !== '' && mb_strtoupper($text, 'UTF-8') === $text && preg_match('/\p{L}/u', $text)) {
-            $lower = mb_strtolower($text, 'UTF-8');
-            $text = mb_strtoupper(mb_substr($lower, 0, 1, 'UTF-8'), 'UTF-8') . mb_substr($lower, 1, null, 'UTF-8');
+        if ($this->isAllUpperCase($text)) {
+            $text = $this->upperFirst(mb_strtolower($text, 'UTF-8'));
         }
 
         return $text;
+    }
+
+    /**
+     * Enthaelt Grossbuchstaben, aber keinen einzigen Kleinbuchstaben.
+     * (mb_strtoupper ist im Plugin-Code nicht erlaubt.)
+     *
+     * @param string $text
+     * @return bool
+     */
+    private function isAllUpperCase(string $text): bool
+    {
+        return (bool)preg_match('/\p{Lu}/u', $text) && !preg_match('/\p{Ll}/u', $text);
+    }
+
+    /**
+     * Ersten Buchstaben gross schreiben, auch bei Umlauten. strtoupper kennt nur ASCII,
+     * mb_strtoupper ist im Plugin-Code nicht erlaubt.
+     *
+     * @param string $text
+     * @return string
+     */
+    private function upperFirst(string $text): string
+    {
+        $first = strtr(mb_substr($text, 0, 1, 'UTF-8'), self::UPPER_UMLAUTS);
+
+        return strtoupper($first) . mb_substr($text, 1, null, 'UTF-8');
     }
 }
