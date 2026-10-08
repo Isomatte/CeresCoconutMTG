@@ -36,35 +36,34 @@ class ShipmentTrackingOrderHistoryContainer
         }
 
         $order = is_array($arg) && isset($arg[0]) ? $arg[0] : null;
-        $orderId = (int)$this->read($order, 'id');
+
+        // Ceres uebergibt die Bestellung je nach Stelle als Modell oder als Array.
+        // Felder einzeln lesen: dynamische Property-Namen sind im
+        // Plugin-Code nicht erlaubt.
+        $orderId = 0;
+        $typeId = 0;
+        $plentyId = 0;
+        if (is_array($order)) {
+            $orderId = (int)($order['id'] ?? 0);
+            $typeId = (int)($order['typeId'] ?? 0);
+            $plentyId = (int)($order['plentyId'] ?? 0);
+        } elseif ($order !== null) {
+            $orderId = (int)$order->id;
+            $typeId = (int)$order->typeId;
+            $plentyId = (int)$order->plentyId;
+        }
 
         // Nur Bestellungen dieses Shops: Die Seite zeigt andere Mandanten nicht an.
         /** @var Application $application */
         $application = pluginApp(Application::class);
         if ($orderId <= 0
-            || (int)$this->read($order, 'typeId') !== self::ORDER_TYPE_SALES
-            || (int)$this->read($order, 'plentyId') !== (int)$application->getPlentyId()) {
+            || $typeId !== self::ORDER_TYPE_SALES
+            || $plentyId !== (int)$application->getPlentyId()) {
             return '';
         }
 
         return $twig->render('CeresCoconutMTG::ShipmentTracking.Containers.OrderHistoryButton', [
             'trackingUrl' => '/sendungsverfolgung/?order=' . $orderId
         ]);
-    }
-
-    /**
-     * Ceres uebergibt die Bestellung je nach Stelle als Modell oder als Array.
-     *
-     * @param mixed $order
-     * @param string $key
-     * @return mixed
-     */
-    private function read($order, string $key)
-    {
-        if (is_array($order)) {
-            return $order[$key] ?? null;
-        }
-
-        return $order !== null ? $order->$key : null;
     }
 }
