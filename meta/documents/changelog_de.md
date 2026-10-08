@@ -1,5 +1,12 @@
 # Release Notes für CeresCoconutMTG
 
+## v1.0.10 (2026-10-08)
+
+### Hinzugefügt
+
+- Button "Sendung verfolgen" je Bestellung in der Auftragshistorie im Kundenkonto (Datenanbieter "Sendungsverfolgung: Button in der Auftragshistorie", Container "Ceres::MyAccount.OrderHistoryPaymentInformation").
+- `/sendungsverfolgung/?order=...` ohne PLZ oder Schlüssel für eingeloggte Kunden, wenn die Bestellung zu ihrem Konto gehört. Sonst Formular mit vorausgefüllter Bestellnummer.
+
 ## v1.0.9 (2026-10-08)
 
 ### Hinzugefügt

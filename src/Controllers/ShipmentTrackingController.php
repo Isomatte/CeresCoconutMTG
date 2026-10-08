@@ -18,6 +18,8 @@ use Plenty\Plugin\Templates\Twig;
  * dem Formular. Der persoenliche Link aus Bestell- und Versandbestaetigung enthaelt
  * statt der PLZ den Zugangsschluessel der Bestellung (?order=...&key=...), damit keine
  * Adressdaten in der URL stehen. ?order=...&zip=... funktioniert ebenfalls.
+ * Eingeloggte Kunden reicht ?order=... (Button in der Auftragshistorie), wenn die
+ * Bestellung zu ihrem Konto gehoert.
  *
  * @package CeresCoconutMTG\Controllers
  */
@@ -69,7 +71,10 @@ class ShipmentTrackingController extends Controller
         }
 
         if (strlen($orderInput) || strlen($zipInput) || strlen($accessKeyInput)) {
-            $lookup = $trackingService->lookup($orderInput, $zipInput, $accessKeyInput);
+            // Nur Bestellnummer: Link aus der Auftragshistorie im Kundenkonto.
+            $lookup = (!strlen($zipInput) && !strlen($accessKeyInput))
+                ? $trackingService->lookupForLoggedInCustomer($orderInput)
+                : $trackingService->lookup($orderInput, $zipInput, $accessKeyInput);
             $tracking['result'] = $lookup['result'];
 
             if ($lookup['result'] === ShipmentTrackingService::RESULT_FOUND) {

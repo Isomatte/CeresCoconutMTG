@@ -1,0 +1,7 @@
+{# Button "Sendung verfolgen" in der Auftragshistorie (ShipmentTrackingOrderHistoryContainer).
+   Gleiches Markup wie die Buttons "Auftragsdetails" und "Zuruecksenden" daneben. #}
+
+<a class="btn btn-primary btn-block" href="{{ trackingUrl }}">
+    <i class="fa fa-truck" aria-hidden="true"></i>
+    {{ trans('CeresCoconutMTG::Template.trackingOrderHistoryButton') }}
+</a>

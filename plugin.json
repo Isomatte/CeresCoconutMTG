@@ -1,5 +1,5 @@
 {
-    "version"           :   "1.0.9",
+    "version"           :   "1.0.10",
     "name"              :   "CeresCoconutMTG",
     "pluginIcon"        :   "icon_plugin_xs.png",
     "authorIcon"        :   "icon_author_xs.png",
@@ -34,6 +34,12 @@
             "key"           :"CeresCoconutMTG\\Containers\\CeresCoconutMTGItemListContainer3",
             "name"          :"Third item list",
             "description"   :"Display a configurable list of items in your online store"
+        },
+        {
+            "key"                   :"CeresCoconutMTG\\Containers\\ShipmentTrackingOrderHistoryContainer",
+            "name"                  :"Sendungsverfolgung: Button in der Auftragshistorie",
+            "description"           :"Button 'Sendung verfolgen' je Bestellung im Kundenkonto. Verknuepfen mit 'Mein Konto: Zahlungsinformationen in der Auftragshistorie'.",
+            "defaultLayoutContainer":"Ceres::MyAccount.OrderHistoryPaymentInformation"
         }
     ]
 }

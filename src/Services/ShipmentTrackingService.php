@@ -9,6 +9,7 @@ use Plenty\Modules\Item\Variation\Contracts\VariationRepositoryContract;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Order\Shipping\ParcelService\Contracts\ParcelServicePresetRepositoryContract;
 use Plenty\Modules\Plugin\Libs\Contracts\LibraryCallContract;
+use Plenty\Modules\Webshop\Contracts\ContactRepositoryContract;
 use Plenty\Plugin\Application;
 use Plenty\Plugin\CachingRepository;
 use Plenty\Plugin\ConfigRepository;
@@ -31,6 +32,8 @@ class ShipmentTrackingService
     const RESULT_NOT_FOUND = 'notFound';
     const RESULT_INVALID = 'invalid';
     const RESULT_LOCKED = 'locked';
+    /** Keine Pruefung moeglich (z. B. nicht eingeloggt): Formular mit vorausgefuellter Bestellnummer. */
+    const RESULT_FORM = 'form';
 
     /** Fehlversuche je Bestellnummer, bevor die Suche gesperrt wird (Schutz vor PLZ-Raten). */
     const MAX_FAILED_ATTEMPTS = 10;
@@ -120,6 +123,37 @@ class ShipmentTrackingService
     }
 
     /**
+     * Bestellung fuer den eingeloggten Kunden ohne PLZ oder Schluessel anzeigen
+     * (Link aus der Auftragshistorie im Kundenkonto).
+     *
+     * Gehoert die Bestellung nicht zum eingeloggten Konto oder ist niemand eingeloggt,
+     * kommt das Formular mit vorausgefuellter Bestellnummer. Das zaehlt nicht als
+     * Fehlversuch, weil keine PLZ geraten wurde.
+     *
+     * @param string $orderInput
+     * @return array ['result' => RESULT_*, 'order' => array|null]
+     */
+    public function lookupForLoggedInCustomer(string $orderInput): array
+    {
+        $orderId = (int)preg_replace('/\D/', '', $orderInput);
+        if ($orderId <= 0) {
+            return ['result' => self::RESULT_INVALID, 'order' => null];
+        }
+
+        $contactId = $this->getLoggedInContactId();
+        if ($contactId <= 0) {
+            return ['result' => self::RESULT_FORM, 'order' => null];
+        }
+
+        $order = $this->findOrder($orderId);
+        if ($order === null || $this->getOrderContactId($order) !== $contactId) {
+            return ['result' => self::RESULT_FORM, 'order' => null];
+        }
+
+        return ['result' => self::RESULT_FOUND, 'order' => $this->buildOrder($order)];
+    }
+
+    /**
      * Cross-Selling-Artikel (Verknuepfung "Zubehoer") zu den bestellten Artikeln.
      *
      * @param array $order Ergebnis von lookup()
@@ -200,6 +234,39 @@ class ShipmentTrackingService
         }
 
         return $order;
+    }
+
+    /**
+     * @return int Kontakt-ID des eingeloggten Kunden, 0 wenn niemand eingeloggt ist
+     */
+    private function getLoggedInContactId(): int
+    {
+        try {
+            /** @var ContactRepositoryContract $contactRepository */
+            $contactRepository = pluginApp(ContactRepositoryContract::class);
+
+            return (int)$contactRepository->getContactId();
+        } catch (\Throwable $exception) {
+            return 0;
+        }
+    }
+
+    /**
+     * Kontakt, dem die Bestellung gehoert (Auftragsbeziehung contact/receiver).
+     * Gastbestellungen haben keinen Kontakt.
+     *
+     * @param mixed $order
+     * @return int
+     */
+    private function getOrderContactId($order): int
+    {
+        foreach ($this->toIterable($order->relations) as $relation) {
+            if ((string)$relation->referenceType === 'contact' && (string)$relation->relation === 'receiver') {
+                return (int)$relation->referenceId;
+            }
+        }
+
+        return 0;
     }
 
     /**

@@ -1,5 +1,12 @@
 # Release Notes for CeresCoconutMTG
 
+## v1.0.10 (2026-10-08)
+
+### Added
+
+- "Track shipment" button for each order in the order history of the customer account (data provider "Sendungsverfolgung: Button in der Auftragshistorie", container "Ceres::MyAccount.OrderHistoryPaymentInformation").
+- `/sendungsverfolgung/?order=...` without postcode or key for logged-in customers if the order belongs to their account. Otherwise the form with the order number pre-filled.
+
 ## v1.0.9 (2026-10-08)
 
 ### Added
