@@ -1,0 +1,92 @@
+{# Ein Paket: Ueberschrift je nach Stand, Fortschritt, Verlauf.
+   Erwartet package (Format aus TrackingNormalizer), index und count. #}
+
+{% set T = 'CeresCoconutMTG::Template.' %}
+{% set visibleEvents = 4 %}
+
+{% if package.state == 'returned' %}
+    {% set headline = trans(T ~ 'trackingHeadlineReturned') %}
+    {% set text = trans(T ~ 'trackingTextReturned') %}
+{% elseif package.stage == 4 %}
+    {% set headline = trans(T ~ 'trackingHeadlineDelivered') %}
+    {% if package.deliveredAt.time %}
+        {% set text = trans(T ~ 'trackingDeliveredAt', {'date': package.deliveredAt.label, 'time': package.deliveredAt.time}) %}
+    {% else %}
+        {% set text = trans(T ~ 'trackingDeliveredOn', {'date': package.deliveredAt.label}) %}
+    {% endif %}
+{% elseif package.state == 'problem' %}
+    {% set headline = trans(T ~ 'trackingHeadlineProblem') %}
+    {% set text = trans(T ~ 'trackingTextProblem', {'message': package.message}) %}
+{% elseif package.stage == 3 %}
+    {% set headline = trans(T ~ 'trackingHeadlineOutForDelivery') %}
+    {% if package.estimated and package.estimated.from and package.estimated.to %}
+        {% set text = trans(T ~ 'trackingTodayWindow', {'from': package.estimated.from, 'to': package.estimated.to}) %}
+    {% else %}
+        {% set text = '' %}
+    {% endif %}
+{% elseif package.stage == 2 %}
+    {% set headline = trans(T ~ 'trackingHeadlineInTransit') %}
+    {% if package.estimated and package.estimated.from and package.estimated.to %}
+        {% set text = trans(T ~ 'trackingEstimatedWindow', {'date': package.estimated.label, 'from': package.estimated.from, 'to': package.estimated.to}) %}
+    {% elseif package.estimated %}
+        {% set text = trans(T ~ 'trackingEstimated', {'date': package.estimated.label}) %}
+    {% else %}
+        {% set text = '' %}
+    {% endif %}
+{% else %}
+    {% set headline = trans(T ~ 'trackingHeadlinePacked') %}
+    {% if package.error %}
+        {% set text = trans(T ~ 'trackingTextError') %}
+    {% else %}
+        {% set text = trans(T ~ 'trackingTextPacked', {'carrier': package.carrierName}) %}
+    {% endif %}
+{% endif %}
+
+<section class="mtg-tracking__card mtg-tracking__package{% if package.state in ['problem', 'returned'] %} is-attention{% endif %}{% if package.stage == 4 %} is-delivered{% endif %}">
+    {% if count > 1 %}
+        <p class="mtg-tracking__package-count">{{ trans(T ~ 'trackingPackageOf', {'index': index, 'count': count}) }}</p>
+    {% endif %}
+
+    <h2 class="mtg-tracking__headline">{{ headline }}</h2>
+    {% if text %}
+        <p class="mtg-tracking__text">{{ text }}</p>
+    {% endif %}
+    {% if package.stage == 4 and package.deliveryLocation and package.deliveryLocation | lower not in ['privat', 'residential'] %}
+        <p class="mtg-tracking__text">{{ trans(T ~ 'trackingDeliveryLocation', {'location': package.deliveryLocation}) }}</p>
+    {% endif %}
+
+    {% include "CeresCoconutMTG::ShipmentTracking.Partials.Steps" with {
+        'stage': package.state == 'returned' ? 2 : package.stage,
+        'problem': package.state in ['problem', 'returned']
+    } only %}
+
+    <dl class="mtg-tracking__number">
+        <dt>{{ trans(T ~ 'trackingNumber') }}</dt>
+        <dd>
+            {{ package.number }}
+            {% if package.carrierUrl %}
+                <a href="{{ package.carrierUrl }}" target="_blank" rel="noopener noreferrer">{{ trans(T ~ 'trackingCarrierLink', {'carrier': package.carrierName}) }}</a>
+            {% endif %}
+        </dd>
+    </dl>
+
+    {% if package.events | length > 0 %}
+        <h3 class="mtg-tracking__subheadline">{{ trans(T ~ 'trackingHistory') }}</h3>
+        <ol class="mtg-timeline">
+            {% for event in package.events | slice(0, visibleEvents) %}
+                {% include "CeresCoconutMTG::ShipmentTracking.Partials.Event" with {'event': event, 'latest': loop.first} only %}
+            {% endfor %}
+        </ol>
+
+        {% if package.events | length > visibleEvents %}
+            <details class="mtg-timeline__more">
+                <summary>{{ trans(T ~ 'trackingShowAllEvents', {'count': package.events | length}) }}</summary>
+                <ol class="mtg-timeline">
+                    {% for event in package.events | slice(visibleEvents) %}
+                        {% include "CeresCoconutMTG::ShipmentTracking.Partials.Event" with {'event': event, 'latest': false} only %}
+                    {% endfor %}
+                </ol>
+            </details>
+        {% endif %}
+    {% endif %}
+</section>

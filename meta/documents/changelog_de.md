@@ -1,5 +1,15 @@
 # Release Notes für CeresCoconutMTG
 
+## v1.0.9 (2026-10-08)
+
+### Hinzugefügt
+
+- Sendungsverfolgungsseite `/sendungsverfolgung`. Der Kunde gibt Bestellnummer und Postleitzahl ein (oder kommt über einen Link mit `?order=...&zip=...`) und sieht für UPS- und DHL-Pakete dieselbe Darstellung: Fortschritt in fünf Stufen, voraussichtliche Zustellung, Sendungsverlauf.
+- Abfrage der UPS Tracking API und der DHL Shipment Tracking API (Unified) über `resources/lib`, Status je Paketnummer zwischengespeichert.
+- Schutz vor Raten der Postleitzahl: nach 10 Fehlversuchen ist eine Bestellnummer eine Stunde gesperrt.
+- Cross-Selling-Artikel (Verknüpfung "Zubehör") zu den bestellten Artikeln und optionaler Link zur Montagehilfe.
+- Neuer Konfigurationstab "Sendungsverfolgung" für Aktivierung, UPS-/DHL-Zugangsdaten, Zwischenspeicher und Montagehilfe-Link.
+
 ## v1.0.8 (2026-09-01)
 
 ### Hinzugefügt

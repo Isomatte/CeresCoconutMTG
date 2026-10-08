@@ -1,0 +1,23 @@
+{# Cross-Selling (Verknuepfung "Zubehoer") zu den bestellten Artikeln.
+   Gleiches Markup wie die Empfehlungen im Warenkorb-Overlay (PageDesign.twig), damit
+   die Kacheln aussehen wie im restlichen Shop. Steht ausserhalb von v-pre, weil
+   carousel und category-item Vue-Komponenten sind. #}
+
+<section class="mtg-tracking__recommendations">
+    <h2 class="mtg-tracking__headline">{{ trans('CeresCoconutMTG::Template.trackingRecommendationsTitle') }}</h2>
+
+    <carousel :items-per-page="4">
+        {% for item in tracking.recommendations %}
+            <template slot="items">
+                <category-item
+                    item-data-ref="{{ item.data | json_data }}"
+                    :decimal-count="{{ ceresConfig.item.storeSpecial | default(0) }}">
+                    <a href="{{ item.data | itemURL }}" class="small">
+                        <i class="fa fa-image" aria-hidden="true"></i>
+                        <span>{{ item.data | itemName }}</span>
+                    </a>
+                </category-item>
+            </template>
+        {% endfor %}
+    </carousel>
+</section>

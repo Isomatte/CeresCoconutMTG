@@ -27,7 +27,8 @@ class CeresCoconutMTGServiceProvider extends ServiceProvider
 
     public function register()
     {
-        // Eigener Endpunkt fuer das Widerrufsformular (/rest/cerescoconutmtg/cancellation).
+        // Eigener Endpunkt fuer das Widerrufsformular (/rest/cerescoconutmtg/cancellation)
+        // und Sendungsverfolgungsseite (/sendungsverfolgung).
         $this->getApplication()->register(CeresCoconutMTGRouteServiceProvider::class);
     }
 

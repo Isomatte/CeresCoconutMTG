@@ -1,0 +1,76 @@
+{# Ergebnis der Sendungsverfolgung: ein Block je Paket, ohne Paketnummer ein Block mit
+   dem Bestellstatus. Danach die bestellten Artikel und der Montagehinweis. #}
+
+{% set order = tracking.order %}
+{% set packageCount = order.packages | length %}
+
+<div class="mtg-tracking__meta">
+    <span>{{ trans('CeresCoconutMTG::Template.trackingOrderMeta', {'order': order.id, 'date': order.date}) }}</span>
+    {% if order.zip %}
+        <span>{{ trans('CeresCoconutMTG::Template.trackingDeliveryTo', {'zip': order.zip, 'town': order.town}) }}</span>
+    {% endif %}
+    <a href="{{ trackingUrl }}">{{ trans('CeresCoconutMTG::Template.trackingOtherOrder') }}</a>
+</div>
+
+<div class="row">
+    <div class="col-12 col-lg-8">
+        {% if packageCount == 0 %}
+            {% set headlines = {
+                'received': ['trackingHeadlineReceived', 'trackingTextReceived'],
+                'payment': ['trackingHeadlinePayment', 'trackingTextPayment'],
+                'processing': ['trackingHeadlineProcessing', 'trackingTextProcessing'],
+                'shipped': ['trackingHeadlineShipped', 'trackingTextShipped'],
+                'canceled': ['trackingHeadlineCanceled', 'trackingTextCanceled'],
+                'other': ['trackingHeadlineOther', 'trackingTextOther']
+            } %}
+            {% set headline = headlines[order.status] %}
+
+            <section class="mtg-tracking__card">
+                <h2 class="mtg-tracking__headline">{{ trans('CeresCoconutMTG::Template.' ~ headline[0]) }}</h2>
+                <p class="mtg-tracking__text">{{ trans('CeresCoconutMTG::Template.' ~ headline[1]) }}</p>
+                {% if order.status not in ['canceled', 'other'] %}
+                    {% include "CeresCoconutMTG::ShipmentTracking.Partials.Steps" with {'stage': order.stage, 'problem': false} only %}
+                {% endif %}
+            </section>
+        {% else %}
+            {% for package in order.packages %}
+                {% include "CeresCoconutMTG::ShipmentTracking.Partials.Package" with {
+                    'package': package,
+                    'index': loop.index,
+                    'count': packageCount
+                } only %}
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <div class="col-12 col-lg-4">
+        {% if order.items | length > 0 %}
+            <section class="mtg-tracking__card mtg-tracking__items">
+                <h2 class="mtg-tracking__subheadline">{{ trans('CeresCoconutMTG::Template.trackingItemsTitle') }}</h2>
+                <ul>
+                    {% for item in order.items %}
+                        <li>
+                            <span class="mtg-tracking__quantity">{{ item.quantity | round(2) }}&nbsp;×</span>
+                            {% if item.itemId > 0 %}
+                                <a href="/a-{{ item.itemId }}">{{ item.name }}</a>
+                            {% else %}
+                                {{ item.name }}
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+        {% endif %}
+
+        {% if tracking.helpUrl %}
+            <section class="mtg-tracking__card mtg-tracking__help">
+                <h2 class="mtg-tracking__subheadline">
+                    <i class="fa fa-wrench" aria-hidden="true"></i>
+                    {{ trans('CeresCoconutMTG::Template.trackingHelpTitle') }}
+                </h2>
+                <p>{{ trans('CeresCoconutMTG::Template.trackingHelpText') }}</p>
+                <a class="btn btn-outline-primary btn-sm" href="{{ tracking.helpUrl }}">{{ trans('CeresCoconutMTG::Template.trackingHelpLink') }}</a>
+            </section>
+        {% endif %}
+    </div>
+</div>

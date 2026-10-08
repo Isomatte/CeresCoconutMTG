@@ -1,0 +1,39 @@
+{# Sendungsverfolgungsseite /sendungsverfolgung.
+
+   Gerendert von CeresCoconutMTG\Controllers\ShipmentTrackingController. Die Daten
+   kommen als "tracking" (siehe Controller und ShipmentTrackingService):
+   result = form | found | notFound | invalid | locked | disabled.
+
+   Ceres mountet Vue ueber die ganze Seite. Alles mit Daten von Paketdiensten oder aus
+   der Bestellung steht deshalb in einem v-pre-Block, damit Vue darin keine
+   Ausdruecke auswertet. Nur die Empfehlungen brauchen Vue (category-item) und stehen
+   ausserhalb. Styles stehen im Head, weil Vue <style> im Seiteninhalt entfernt. #}
+
+{% extends getPartial('page-design') %}
+
+{% block PartialHead %}
+    <title>{{ trans('CeresCoconutMTG::Template.trackingTitle') }} | {{ trans('Ceres::Template.headerCompanyName') }}</title>
+    <meta name="description" content="{{ trans('CeresCoconutMTG::Template.trackingMetaDescription') }}">
+    <meta name="robots" content="noindex, nofollow">
+    {% include "CeresCoconutMTG::ShipmentTracking.Partials.Styles" %}
+{% endblock %}
+
+{% block PageBody %}
+    {% set trackingUrl = urls.appendTrailingSlash ? '/sendungsverfolgung/' : '/sendungsverfolgung' %}
+
+    <div class="container-max page-content mtg-tracking">
+        <div v-pre>
+            <h1 class="mtg-tracking__title">{{ trans('CeresCoconutMTG::Template.trackingTitle') }}</h1>
+
+            {% if tracking.result == "found" %}
+                {% include "CeresCoconutMTG::ShipmentTracking.Partials.Result" %}
+            {% else %}
+                {% include "CeresCoconutMTG::ShipmentTracking.Partials.Form" %}
+            {% endif %}
+        </div>
+
+        {% if tracking.recommendations | length > 0 %}
+            {% include "CeresCoconutMTG::ShipmentTracking.Partials.Recommendations" %}
+        {% endif %}
+    </div>
+{% endblock %}

@@ -1,0 +1,47 @@
+{# Suchformular der Sendungsverfolgung. Postet auf dieselbe Seite. #}
+
+<div class="row">
+    <div class="col-12 col-md-8 col-lg-6">
+        <p class="mtg-tracking__lead">{{ trans('CeresCoconutMTG::Template.trackingIntro') }}</p>
+
+        {% if tracking.result == "notFound" %}
+            <div class="alert alert-danger" role="alert">{{ trans('CeresCoconutMTG::Template.trackingErrorNotFound') }}</div>
+        {% elseif tracking.result == "invalid" %}
+            <div class="alert alert-danger" role="alert">{{ trans('CeresCoconutMTG::Template.trackingErrorInvalid') }}</div>
+        {% elseif tracking.result == "locked" %}
+            <div class="alert alert-warning" role="alert">{{ trans('CeresCoconutMTG::Template.trackingErrorLocked') }}</div>
+        {% elseif tracking.result == "disabled" %}
+            <div class="alert alert-info" role="status">{{ trans('CeresCoconutMTG::Template.trackingDisabled') }}</div>
+        {% endif %}
+
+        {% if tracking.result != "disabled" %}
+            <form class="mtg-tracking__form" method="post" action="{{ trackingUrl }}">
+                <div class="input-unit required">
+                    <input type="text" name="order" id="mtg-tracking-order" value="{{ tracking.orderInput }}"
+                           inputmode="numeric" autocomplete="off" maxlength="30" required
+                           aria-describedby="mtg-tracking-order-hint">
+                    <label for="mtg-tracking-order">{{ trans('CeresCoconutMTG::Template.trackingFieldOrder') }}*</label>
+                </div>
+                <p class="mtg-tracking__hint" id="mtg-tracking-order-hint">{{ trans('CeresCoconutMTG::Template.trackingFieldOrderHint') }}</p>
+
+                <div class="input-unit required">
+                    <input type="text" name="zip" id="mtg-tracking-zip"
+                           autocomplete="postal-code" maxlength="10" required
+                           aria-describedby="mtg-tracking-zip-hint">
+                    <label for="mtg-tracking-zip">{{ trans('CeresCoconutMTG::Template.trackingFieldZip') }}*</label>
+                </div>
+                <p class="mtg-tracking__hint" id="mtg-tracking-zip-hint">{{ trans('CeresCoconutMTG::Template.trackingFieldZipHint') }}</p>
+
+                <button type="submit" class="btn btn-primary btn-block">
+                    <i class="fa fa-search" aria-hidden="true"></i>
+                    {{ trans('CeresCoconutMTG::Template.trackingSubmit') }}
+                </button>
+            </form>
+
+            <p class="mtg-tracking__account">
+                {{ trans('CeresCoconutMTG::Template.trackingAccountHint') }}
+                <a href="{{ urls.myAccount | default('/my-account') }}">{{ trans('CeresCoconutMTG::Template.trackingMyAccount') }}</a>
+            </p>
+        {% endif %}
+    </div>
+</div>

@@ -164,6 +164,65 @@
                 }
             }
         },
+        "Config.TrackingTab": {
+            "label": "Config.TrackingTab",
+            "formFields": {
+                "tracking.enabled": {
+                    "type": "checkBox",
+                    "required": false,
+                    "label": "Config.trackingEnabledLabel",
+                    "options": {
+                        "defaultValue": "false",
+                        "tooltip": "Config.trackingEnabledTooltip"
+                    }
+                },
+                "tracking.upsClientId": {
+                    "type": "text",
+                    "required": false,
+                    "label": "Config.trackingUpsClientIdLabel",
+                    "options": {
+                        "defaultValue": "",
+                        "tooltip": "Config.trackingUpsTooltip"
+                    }
+                },
+                "tracking.upsClientSecret": {
+                    "type": "text",
+                    "required": false,
+                    "label": "Config.trackingUpsClientSecretLabel",
+                    "options": {
+                        "defaultValue": "",
+                        "tooltip": "Config.trackingUpsTooltip"
+                    }
+                },
+                "tracking.dhlApiKey": {
+                    "type": "text",
+                    "required": false,
+                    "label": "Config.trackingDhlApiKeyLabel",
+                    "options": {
+                        "defaultValue": "",
+                        "tooltip": "Config.trackingDhlApiKeyTooltip"
+                    }
+                },
+                "tracking.cacheMinutes": {
+                    "type": "text",
+                    "required": false,
+                    "label": "Config.trackingCacheMinutesLabel",
+                    "options": {
+                        "defaultValue": "15",
+                        "tooltip": "Config.trackingCacheMinutesTooltip"
+                    }
+                },
+                "tracking.helpUrl": {
+                    "type": "text",
+                    "required": false,
+                    "label": "Config.trackingHelpUrlLabel",
+                    "options": {
+                        "defaultValue": "",
+                        "tooltip": "Config.trackingHelpUrlTooltip"
+                    }
+                }
+            }
+        },
         "Config.ResultFieldsTab": {
             "label": "Config.ResultFieldsTab",
             "formFields": {

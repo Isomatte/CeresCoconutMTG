@@ -9,7 +9,8 @@ use Plenty\Plugin\Routing\Router;
 /**
  * Class CeresCoconutMTGRouteServiceProvider
  *
- * Registriert den eigenen Endpunkt fuer das Widerrufsformular des Themes.
+ * Registriert die Sendungsverfolgungsseite und den eigenen Endpunkt fuer das
+ * Widerrufsformular des Themes.
  *
  * Hintergrund: Das Ceres-Widget "E-Mail-Formular" postet beim Formulartyp
  * "Formular zum Vertragswiderruf" auf /rest/io/cancellation. Dieser Core-Endpunkt
@@ -31,6 +32,11 @@ class CeresCoconutMTGRouteServiceProvider extends RouteServiceProvider
      */
     public function map(Router $router, ApiRouter $api)
     {
+        // Sendungsverfolgung: Formular (GET), Suche aus dem Formular (POST) und Link aus
+        // der Versandbestaetigung (GET mit order + zip).
+        $router->get('sendungsverfolgung', 'CeresCoconutMTG\Controllers\ShipmentTrackingController@show');
+        $router->post('sendungsverfolgung', 'CeresCoconutMTG\Controllers\ShipmentTrackingController@show');
+
         $api->version(
             ['v1'],
             ['namespace' => 'CeresCoconutMTG\Controllers'],

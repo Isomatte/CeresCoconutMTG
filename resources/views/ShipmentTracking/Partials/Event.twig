@@ -1,0 +1,11 @@
+{# Ein Eintrag im Sendungsverlauf. Erwartet event und latest. #}
+
+<li class="mtg-timeline__event{% if latest %} is-latest{% endif %}{% if event.problem %} is-problem{% endif %}">
+    <span class="mtg-timeline__when">
+        {{ event.dateLabel }}{% if event.time %}, {{ trans('CeresCoconutMTG::Template.trackingEventTime', {'time': event.time}) }}{% endif %}
+    </span>
+    <span class="mtg-timeline__text">{{ event.text }}</span>
+    {% if event.location %}
+        <span class="mtg-timeline__where">{{ event.location }}</span>
+    {% endif %}
+</li>

@@ -1,0 +1,20 @@
+{# Fortschrittsanzeige mit fuenf Stufen (TrackingNormalizer::STAGE_*).
+   Erwartet stage (0-4) und problem. #}
+
+{% set steps = [
+    {'icon': 'fa-shopping-cart', 'label': 'trackingStepOrdered'},
+    {'icon': 'fa-archive', 'label': 'trackingStepPacked'},
+    {'icon': 'fa-truck', 'label': 'trackingStepInTransit'},
+    {'icon': 'fa-map-marker', 'label': 'trackingStepOutForDelivery'},
+    {'icon': 'fa-home', 'label': 'trackingStepDelivered'}
+] %}
+
+<ol class="mtg-steps{% if problem %} has-problem{% endif %}" aria-label="{{ trans('CeresCoconutMTG::Template.trackingProgress') }}">
+    {% for step in steps %}
+        {% set index = loop.index0 %}
+        <li class="mtg-steps__step{% if index <= stage %} is-done{% endif %}{% if index == stage %} is-current{% endif %}"{% if index == stage %} aria-current="step"{% endif %}>
+            <span class="mtg-steps__icon"><i class="fa {{ step.icon }}" aria-hidden="true"></i></span>
+            <span class="mtg-steps__label">{{ trans('CeresCoconutMTG::Template.' ~ step.label) }}</span>
+        </li>
+    {% endfor %}
+</ol>

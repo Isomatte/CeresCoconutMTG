@@ -1,5 +1,15 @@
 # Release Notes for CeresCoconutMTG
 
+## v1.0.9 (2026-10-08)
+
+### Added
+
+- Shipment tracking page `/sendungsverfolgung`. Customers enter order number and postcode (or follow a link with `?order=...&zip=...`) and see the same view for UPS and DHL packages: five-step progress, estimated delivery and tracking history.
+- Requests to the UPS Tracking API and the DHL Shipment Tracking API (Unified) via `resources/lib`, status cached per tracking number.
+- Protection against guessing the postcode: after 10 failed attempts an order number is locked for one hour.
+- Cross-selling items (relation "Accessory") for the ordered items and an optional link to installation help.
+- New configuration tab "Shipment tracking" for activation, UPS/DHL credentials, cache and installation help link.
+
 ## v1.0.8 (2026-09-01)
 
 ### Added
