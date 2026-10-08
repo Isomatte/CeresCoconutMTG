@@ -6,6 +6,8 @@
 
 - Sendungsverfolgungsseite `/sendungsverfolgung`. Der Kunde gibt Bestellnummer und Postleitzahl ein (oder kommt über einen Link mit `?order=...&zip=...`) und sieht für UPS- und DHL-Pakete dieselbe Darstellung: Fortschritt in fünf Stufen, voraussichtliche Zustellung, Sendungsverlauf.
 - Abfrage der UPS Tracking API und der DHL Shipment Tracking API (Unified) über `resources/lib`, Status je Paketnummer zwischengespeichert.
+- Persönlicher Link für Bestell- und Versandbestätigung: `?order=...&key=...` mit dem Zugangsschlüssel der Bestellung (wie bei "Bestellung einsehen"), ohne Adressdaten in der URL.
+- Hinweis bei offener Zahlung mit offenem Betrag; bei Überweisung Verweis auf die Bankdaten in der Bestellbestätigung.
 - Schutz vor Raten der Postleitzahl: nach 10 Fehlversuchen ist eine Bestellnummer eine Stunde gesperrt.
 - Cross-Selling-Artikel (Verknüpfung "Zubehör") zu den bestellten Artikeln und optionaler Link zur Montagehilfe.
 - Neuer Konfigurationstab "Sendungsverfolgung" für Aktivierung, UPS-/DHL-Zugangsdaten, Zwischenspeicher und Montagehilfe-Link.

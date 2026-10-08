@@ -1,0 +1,15 @@
+{# Hinweis bei offener Zahlung (ShipmentTrackingService::getOpenPayment).
+   Erwartet payment = {state, open, currency, bankTransfer}. #}
+
+{% set T = 'CeresCoconutMTG::Template.' %}
+{% set amount = payment.open | number_format(2, ',', '.') ~ ' ' ~ (payment.currency == 'EUR' ? '€' : payment.currency) %}
+
+<section class="mtg-tracking__payment" role="status">
+    <h2 class="mtg-tracking__subheadline">
+        <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+        {{ trans(T ~ 'trackingPaymentTitle') }}
+    </h2>
+    <p>{{ trans(T ~ (payment.state == 'partlyPaid' ? 'trackingPaymentPartly' : 'trackingPaymentUnpaid'), {'amount': amount}) }}</p>
+    <p>{{ trans(T ~ (payment.bankTransfer ? 'trackingPaymentBankTransfer' : 'trackingPaymentOther')) }}</p>
+    <p class="mb-0"><a href="{{ urls.contact }}">{{ trans(T ~ 'trackingPaymentContact') }}</a></p>
+</section>

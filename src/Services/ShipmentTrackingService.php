@@ -43,7 +43,13 @@ class ShipmentTrackingService
     const DEFAULT_CACHE_MINUTES = 15;
 
     const ORDER_TYPE_SALES = 1;
+    const ORDER_PROPERTY_PAYMENT_METHOD = 3;
     const ORDER_PROPERTY_SHIPPING_PROFILE = 2;
+    const ORDER_PROPERTY_PAYMENT_STATUS = 4;
+    /** Zahlungsstatus, bei denen noch Geld fehlt. */
+    const OPEN_PAYMENT_STATES = ['unpaid', 'partlyPaid'];
+    /** Zahlarten mit Ueberweisung durch den Kunden: Vorkasse, Mollie Bank transfer. */
+    const BANK_TRANSFER_METHODS = [6000, 6006];
     const ADDRESS_TYPE_BILLING = 1;
     const ADDRESS_TYPE_DELIVERY = 2;
     /** Auftragspositionen, die der Kunde sieht: Variante, Artikelpaket. */
@@ -74,19 +80,22 @@ class ShipmentTrackingService
     /**
      * Bestellung suchen und Sendungsstatus zusammenstellen.
      *
-     * Bestellnummer und PLZ muessen zusammenpassen. Ob es die Bestellnummer gibt,
-     * verraet die Antwort bewusst nicht.
+     * Zur Bestellnummer muss entweder die PLZ (Formular) oder der Zugangsschluessel der
+     * Bestellung (persoenlicher Link aus den Mails, wie bei "Bestellung einsehen")
+     * passen. Ob es die Bestellnummer gibt, verraet die Antwort bewusst nicht.
      *
      * @param string $orderInput
      * @param string $zipInput
+     * @param string $accessKeyInput
      * @return array ['result' => RESULT_*, 'order' => array|null]
      */
-    public function lookup(string $orderInput, string $zipInput): array
+    public function lookup(string $orderInput, string $zipInput, string $accessKeyInput = ''): array
     {
         $orderId = (int)preg_replace('/\D/', '', $orderInput);
         $zip = $this->normalizeZip($zipInput);
+        $accessKey = preg_match('/^[A-Za-z0-9]{4,64}$/', $accessKeyInput) ? $accessKeyInput : '';
 
-        if ($orderId <= 0 || !strlen($zip)) {
+        if ($orderId <= 0 || (!strlen($zip) && !strlen($accessKey))) {
             return ['result' => self::RESULT_INVALID, 'order' => null];
         }
 
@@ -98,7 +107,11 @@ class ShipmentTrackingService
 
         $order = $this->findOrder($orderId);
 
-        if ($order === null || !$this->orderMatchesZip($order, $zip)) {
+        $matches = $order !== null && (strlen($accessKey)
+            ? $this->orderMatchesAccessKey($orderId, $accessKey)
+            : $this->orderMatchesZip($order, $zip));
+
+        if (!$matches) {
             $this->cache->put($failedKey, $failedAttempts + 1, self::LOCK_MINUTES);
             return ['result' => self::RESULT_NOT_FOUND, 'order' => null];
         }
@@ -187,6 +200,39 @@ class ShipmentTrackingService
         }
 
         return $order;
+    }
+
+    /**
+     * Zugangsschluessel pruefen, derselbe wie im Link "Bestellung einsehen"
+     * (/-/akQQ{schluessel}/idQQ{bestellnummer}).
+     *
+     * @param int $orderId
+     * @param string $accessKey
+     * @return bool
+     */
+    private function orderMatchesAccessKey(int $orderId, string $accessKey): bool
+    {
+        try {
+            /** @var AuthHelper $authHelper */
+            $authHelper = pluginApp(AuthHelper::class);
+            /** @var OrderRepositoryContract $orderRepository */
+            $orderRepository = pluginApp(OrderRepositoryContract::class);
+
+            $order = $authHelper->processUnguarded(function () use ($orderRepository, $orderId, $accessKey) {
+                return $orderRepository->findOrderByAccessKey($orderId, $accessKey);
+            });
+        } catch (\Throwable $exception) {
+            // Falscher Schluessel wirft eine Exception. Wird geloggt, damit ein
+            // grundsaetzliches Problem (z. B. geaenderte Plenty-Schnittstelle) auffaellt.
+            $this->getLogger(__METHOD__)->info(
+                'CeresCoconutMTG: Zugangsschluessel der Bestellung passt nicht.',
+                ['orderId' => $orderId, 'message' => $exception->getMessage()]
+            );
+
+            return false;
+        }
+
+        return $order !== null && (int)$order->id === $orderId;
     }
 
     /**
@@ -279,8 +325,64 @@ class ShipmentTrackingService
             'stage' => $this->getOrderStage((float)$order->statusId, $packages),
             'items' => $items,
             'itemIds' => $this->uniqueItemIds($itemIds),
-            'packages' => $packages
+            'packages' => $packages,
+            'payment' => $this->getOpenPayment($order)
         ];
+    }
+
+    /**
+     * Offene Zahlung der Bestellung. Versendet wird nur, was bezahlt ist, deshalb
+     * bekommt der Kunde bei offener Zahlung einen Hinweis.
+     *
+     * @param mixed $order
+     * @return array|null ['state' => 'unpaid'|'partlyPaid', 'open' => float, 'currency' => string, 'bankTransfer' => bool]
+     */
+    private function getOpenPayment($order)
+    {
+        $state = (string)$this->getOrderProperty($order, self::ORDER_PROPERTY_PAYMENT_STATUS);
+        $statusId = (float)$order->statusId;
+
+        // Stornierte Bestellungen haben einen eigenen Hinweis.
+        if (!in_array($state, self::OPEN_PAYMENT_STATES, true) || ($statusId >= 8 && $statusId < 9)) {
+            return null;
+        }
+
+        // Betrag in Auftragswaehrung bevorzugen, sonst Systemwaehrung.
+        $amount = null;
+        foreach ($this->toIterable($order->amounts) as $orderAmount) {
+            if ($amount === null || !$orderAmount->isSystemCurrency) {
+                $amount = $orderAmount;
+            }
+        }
+
+        $open = $amount !== null ? round((float)$amount->invoiceTotal - (float)$amount->paidAmount, 2) : 0.0;
+        if ($open <= 0) {
+            return null;
+        }
+
+        return [
+            'state' => $state,
+            'open' => $open,
+            'currency' => $amount !== null ? (string)$amount->currency : 'EUR',
+            'bankTransfer' => in_array((int)$this->getOrderProperty($order, self::ORDER_PROPERTY_PAYMENT_METHOD), self::BANK_TRANSFER_METHODS, true)
+        ];
+    }
+
+    /**
+     * @param mixed $order
+     * @param int $typeId
+     * @return string Wert der Auftragseigenschaft, leer wenn nicht vorhanden
+     */
+    private function getOrderProperty($order, int $typeId): string
+    {
+        $value = '';
+        foreach ($this->toIterable($order->properties) as $property) {
+            if ((int)$property->typeId === $typeId) {
+                $value = (string)$property->value;
+            }
+        }
+
+        return $value;
     }
 
     /**
@@ -484,12 +586,7 @@ class ShipmentTrackingService
      */
     private function getCarrierFromShippingProfile($order): string
     {
-        $profileId = 0;
-        foreach ($this->toIterable($order->properties) as $property) {
-            if ((int)$property->typeId === self::ORDER_PROPERTY_SHIPPING_PROFILE) {
-                $profileId = (int)$property->value;
-            }
-        }
+        $profileId = (int)$this->getOrderProperty($order, self::ORDER_PROPERTY_SHIPPING_PROFILE);
 
         if ($profileId <= 0) {
             return TrackingNormalizer::CARRIER_UNKNOWN;

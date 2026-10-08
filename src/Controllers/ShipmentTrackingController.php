@@ -14,9 +14,10 @@ use Plenty\Plugin\Templates\Twig;
  *
  * Sendungsverfolgungsseite /sendungsverfolgung.
  *
- * GET ohne Parameter zeigt das Suchformular. Bestellnummer und PLZ kommen entweder per
- * POST aus dem Formular oder per GET aus dem Link in der Versandbestaetigung
- * (?order=...&zip=...).
+ * GET ohne Parameter zeigt das Suchformular. Bestellnummer und PLZ kommen per POST aus
+ * dem Formular. Der persoenliche Link aus Bestell- und Versandbestaetigung enthaelt
+ * statt der PLZ den Zugangsschluessel der Bestellung (?order=...&key=...), damit keine
+ * Adressdaten in der URL stehen. ?order=...&zip=... funktioniert ebenfalls.
  *
  * @package CeresCoconutMTG\Controllers
  */
@@ -25,7 +26,7 @@ class ShipmentTrackingController extends Controller
     const TEMPLATE = 'CeresCoconutMTG::ShipmentTracking.ShipmentTracking';
 
     /** Maximale Laenge der Eingaben, alles darueber ist kein echter Wert. */
-    const MAX_INPUT_LENGTH = 30;
+    const MAX_INPUT_LENGTH = 64;
 
     /** @var Request */
     private $request;
@@ -52,6 +53,7 @@ class ShipmentTrackingController extends Controller
     {
         $orderInput = $this->readInput('order');
         $zipInput = $this->readInput('zip');
+        $accessKeyInput = $this->readInput('key');
 
         $tracking = [
             'result' => 'form',
@@ -66,8 +68,8 @@ class ShipmentTrackingController extends Controller
             return $this->render($twig, $tracking, 404);
         }
 
-        if (strlen($orderInput) || strlen($zipInput)) {
-            $lookup = $trackingService->lookup($orderInput, $zipInput);
+        if (strlen($orderInput) || strlen($zipInput) || strlen($accessKeyInput)) {
+            $lookup = $trackingService->lookup($orderInput, $zipInput, $accessKeyInput);
             $tracking['result'] = $lookup['result'];
 
             if ($lookup['result'] === ShipmentTrackingService::RESULT_FOUND) {

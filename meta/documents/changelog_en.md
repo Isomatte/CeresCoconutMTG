@@ -6,6 +6,8 @@
 
 - Shipment tracking page `/sendungsverfolgung`. Customers enter order number and postcode (or follow a link with `?order=...&zip=...`) and see the same view for UPS and DHL packages: five-step progress, estimated delivery and tracking history.
 - Requests to the UPS Tracking API and the DHL Shipment Tracking API (Unified) via `resources/lib`, status cached per tracking number.
+- Personal link for order and shipping confirmation: `?order=...&key=...` with the order's access key (as used by "view order"), without address data in the URL.
+- Notice for outstanding payments including the amount due; for bank transfers a pointer to the bank details in the order confirmation.
 - Protection against guessing the postcode: after 10 failed attempts an order number is locked for one hour.
 - Cross-selling items (relation "Accessory") for the ordered items and an optional link to installation help.
 - New configuration tab "Shipment tracking" for activation, UPS/DHL credentials, cache and installation help link.
