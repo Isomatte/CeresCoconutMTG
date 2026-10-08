@@ -273,7 +273,8 @@ class ShipmentTrackingService
             'id' => $orderId,
             'date' => $this->formatDate($order->createdAt),
             'zip' => $zip,
-            'town' => $deliveryAddress !== null ? trim((string)$deliveryAddress->town) : '',
+            // Kunden tippen den Ort oft klein ("magdeburg").
+            'town' => $deliveryAddress !== null ? $this->normalizer->upperFirst(trim((string)$deliveryAddress->town)) : '',
             'status' => $this->getOrderStatus((float)$order->statusId),
             'stage' => $this->getOrderStage((float)$order->statusId, $packages),
             'items' => $items,

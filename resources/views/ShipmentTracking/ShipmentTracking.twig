@@ -22,7 +22,7 @@
     {% set trackingUrl = urls.appendTrailingSlash ? '/sendungsverfolgung/' : '/sendungsverfolgung' %}
 
     <div class="container-max page-content mtg-tracking">
-        <div v-pre>
+        <div class="mtg-tracking__main" v-pre>
             <h1 class="mtg-tracking__title">{{ trans('CeresCoconutMTG::Template.trackingTitle') }}</h1>
 
             {% if tracking.result == "found" %}

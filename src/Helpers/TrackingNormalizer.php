@@ -556,7 +556,7 @@ class TrackingNormalizer
      * @param string $text
      * @return string
      */
-    private function upperFirst(string $text): string
+    public function upperFirst(string $text): string
     {
         $first = mb_substr($text, 0, 1, 'UTF-8');
         $first = self::UPPER_UMLAUTS[$first] ?? strtoupper($first);

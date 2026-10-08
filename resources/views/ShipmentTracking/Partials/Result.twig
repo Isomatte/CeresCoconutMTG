@@ -46,7 +46,10 @@
     <div class="col-12 col-lg-4">
         {% if order.items | length > 0 %}
             <section class="mtg-tracking__card mtg-tracking__items">
-                <h2 class="mtg-tracking__subheadline">{{ trans('CeresCoconutMTG::Template.trackingItemsTitle') }}</h2>
+                <h2 class="mtg-tracking__subheadline">
+                    <i class="fa fa-shopping-basket" aria-hidden="true"></i>
+                    {{ trans('CeresCoconutMTG::Template.trackingItemsTitle') }}
+                </h2>
                 <ul>
                     {% for item in order.items %}
                         <li>
@@ -69,7 +72,7 @@
                     {{ trans('CeresCoconutMTG::Template.trackingHelpTitle') }}
                 </h2>
                 <p>{{ trans('CeresCoconutMTG::Template.trackingHelpText') }}</p>
-                <a class="btn btn-outline-primary btn-sm" href="{{ tracking.helpUrl }}">{{ trans('CeresCoconutMTG::Template.trackingHelpLink') }}</a>
+                <a class="btn btn-mtg-accent btn-sm" href="{{ tracking.helpUrl }}">{{ trans('CeresCoconutMTG::Template.trackingHelpLink') }}</a>
             </section>
         {% endif %}
     </div>

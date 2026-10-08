@@ -32,7 +32,7 @@
                 </div>
                 <p class="mtg-tracking__hint" id="mtg-tracking-zip-hint">{{ trans('CeresCoconutMTG::Template.trackingFieldZipHint') }}</p>
 
-                <button type="submit" class="btn btn-primary btn-block">
+                <button type="submit" class="btn btn-mtg-accent btn-block">
                     <i class="fa fa-search" aria-hidden="true"></i>
                     {{ trans('CeresCoconutMTG::Template.trackingSubmit') }}
                 </button>
@@ -44,4 +44,17 @@
             </p>
         {% endif %}
     </div>
+
+    {% if tracking.result != "disabled" %}
+        <div class="col-12 col-md-8 col-lg-5 offset-lg-1">
+            <aside class="mtg-tracking__benefits">
+                <h2 class="mtg-tracking__subheadline mt-0">{{ trans('CeresCoconutMTG::Template.trackingBenefitsTitle') }}</h2>
+                <ul>
+                    <li><i class="fa fa-truck" aria-hidden="true"></i>{{ trans('CeresCoconutMTG::Template.trackingBenefitCarrier') }}</li>
+                    <li><i class="fa fa-clock-o" aria-hidden="true"></i>{{ trans('CeresCoconutMTG::Template.trackingBenefitWindow') }}</li>
+                    <li><i class="fa fa-wrench" aria-hidden="true"></i>{{ trans('CeresCoconutMTG::Template.trackingBenefitHelp') }}</li>
+                </ul>
+            </aside>
+        </div>
+    {% endif %}
 </div>
