@@ -5,6 +5,8 @@
    - mtg-js an <html>: Kopier-Button und Blaetterpfeile erscheinen nur mit JavaScript.
    - [data-mtg-copy]: Sendungsnummer in die Zwischenablage kopieren.
    - [data-mtg-scroll]: Empfehlungsreihe (aria-controls) um ca. eine Breite blaettern.
+   - [data-mtg-required]: eigener Hinweis bei leerem Pflichtfeld. Die Browser-Meldung
+     ("Please fill out this field") kommt sonst in der Sprache des Browsers.
 
    Paket-Umschalter und "Alle Ereignisse" funktionieren ohne Skript (Radiobuttons bzw.
    Checkbox, siehe Styles.twig). #}
@@ -50,6 +52,22 @@
             }
         });
     }
+
+    // "invalid" steigt nicht auf, deshalb in der Capture-Phase abfangen.
+    document.addEventListener('invalid', function (event) {
+        var field = event.target;
+        var message = field && field.getAttribute ? field.getAttribute('data-mtg-required') : '';
+        if (message && field.validity && field.validity.valueMissing) {
+            field.setCustomValidity(message);
+        }
+    }, true);
+
+    document.addEventListener('input', function (event) {
+        var field = event.target;
+        if (field && field.getAttribute && field.getAttribute('data-mtg-required')) {
+            field.setCustomValidity('');
+        }
+    }, true);
 
     document.addEventListener('click', function (event) {
         var target = event.target;

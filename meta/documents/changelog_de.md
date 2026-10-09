@@ -8,6 +8,7 @@
 - Ergebnis: Zustelltag und Zeitfenster groß im Kopf, Umschalter zwischen mehreren Paketen (ohne JavaScript), Karte "Sendungsstatus" mit Fortschritt, Sendungsnummer (kopierbar) und Link zum Paketdienst, Sendungsverlauf nach Tagen gruppiert, daneben "Ihre Bestellung" mit Artikelbildern und "Fragen zur Lieferung?".
 - Eigenes Mobil-Layout mit gruppierten Listen.
 - Empfehlungen als wischbare Reihe mit Blätterpfeilen statt Karussell.
+- Postleitzahl-Feld öffnet mobil die Zifferntastatur. Hinweise bei leeren Pflichtfeldern kommen in der Shop-Sprache statt in der Sprache des Browsers.
 
 ## v1.0.10 (2026-10-08)
 

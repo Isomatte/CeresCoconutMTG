@@ -46,6 +46,7 @@
                     <label class="mtg-field__label" for="mtg-tracking-order">{{ trans(T ~ 'trackingFieldOrder') }}</label>
                     <input class="mtg-field__input" type="text" name="order" id="mtg-tracking-order" value="{{ tracking.orderInput }}"
                            inputmode="numeric" autocomplete="off" maxlength="30" required
+                           data-mtg-required="{{ trans(T ~ 'trackingFieldOrderRequired') }}"
                            placeholder="{{ trans(T ~ 'trackingFieldOrderPlaceholder') }}"
                            aria-describedby="mtg-tracking-order-hint">
                     <span class="mtg-field__hint" id="mtg-tracking-order-hint">{{ trans(T ~ 'trackingFieldOrderHint') }}</span>
@@ -54,7 +55,8 @@
                 <div class="mtg-field mtg-field--zip">
                     <label class="mtg-field__label" for="mtg-tracking-zip">{{ trans(T ~ 'trackingFieldZip') }}</label>
                     <input class="mtg-field__input" type="text" name="zip" id="mtg-tracking-zip"
-                           autocomplete="postal-code" maxlength="10" required
+                           inputmode="numeric" autocomplete="postal-code" maxlength="10" required
+                           data-mtg-required="{{ trans(T ~ 'trackingFieldZipRequired') }}"
                            placeholder="{{ trans(T ~ 'trackingFieldZipPlaceholder') }}"
                            aria-describedby="mtg-tracking-zip-hint">
                     <span class="mtg-field__hint" id="mtg-tracking-zip-hint">{{ trans(T ~ 'trackingFieldZipHint') }}</span>
