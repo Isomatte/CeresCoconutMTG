@@ -1,4 +1,19 @@
-{% if assetName != 'ceres-checkout' or services.template.isCurrentTemplate("tpl.basket") or services.template.isCurrentTemplate("tpl.confirmation") or services.template.isCurrentTemplate("tpl.register") or services.template.isMyAccount() %}
+{# Ceres liefert neben dem Checkout auch Wunschliste, 404, Newsletter-Abmeldung usw. mit dem
+   Checkout-Paket aus (assetName 'ceres-checkout'). Diese Seiten brauchen trotzdem Fonts und
+   main.min.css, sonst fehlen Header und Footer des Themes. Ohne Theme-CSS bleiben nur Checkout
+   und Login (Design von ConversionCheckout). #}
+{% if assetName != 'ceres-checkout'
+    or services.template.isCurrentTemplate("tpl.basket")
+    or services.template.isCurrentTemplate("tpl.confirmation")
+    or services.template.isCurrentTemplate("tpl.register")
+    or services.template.isMyAccount()
+    or services.template.isCurrentTemplate("tpl.wish-list")
+    or services.template.isCurrentTemplate("tpl.page-not-found")
+    or services.template.isCurrentTemplate("tpl.newsletter.opt-out")
+    or services.template.isCurrentTemplate("tpl.password-reset")
+    or services.template.isCurrentTemplate("tpl.change-mail")
+    or services.template.isCurrentTemplate("tpl.order.return")
+    or services.template.isCurrentTemplate("tpl.order.return.confirmation") %}
 <!-- This template is only used for providing the stylesheet path in the respective container. The stylesheet will only apply if the CeresCoconutMTG Stylesheet data provider is linked in the CMS » Container link menu -->
 <style>
 

@@ -1,5 +1,11 @@
 # Release Notes for CeresCoconutMTG
 
+## v1.0.12 (2026-10-09)
+
+### Fixed
+
+- The wish list, the 404 page and the newsletter opt-out page load the theme fonts and styles again. Ceres delivers these pages with the checkout bundle, so the theme header, footer and fonts were missing. The same applies to password reset, change e-mail and returns. Checkout and login are unchanged.
+
 ## v1.0.11 (2026-10-09)
 
 ### Changed
