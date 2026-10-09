@@ -1,83 +1,148 @@
-{# Ergebnis der Sendungsverfolgung: ein Block je Paket, ohne Paketnummer ein Block mit
-   dem Bestellstatus. Danach die bestellten Artikel und der Montagehinweis. #}
+{# Ergebnis der Sendungsverfolgung (Entwurf "E · Ergebnis Desktop/Mobil"): dunkler Kopf
+   mit dem Zustelltag, darunter Sendungsstatus und Verlauf, daneben die bestellten
+   Artikel und der Kontakt. Ohne Paketnummer zeigt die Seite den Bestellstatus.
 
+   Mehrere Pakete: Umschalter ohne JavaScript. Die Radiobuttons stehen vor Kopf und
+   Inhalt, die Regeln je Paket erzeugt Styles.twig. Alles mit data-mtg-package gehoert
+   zu einem Paket. #}
+
+{% set T = 'CeresCoconutMTG::Template.' %}
 {% set order = tracking.order %}
 {% set packageCount = order.packages | length %}
+{% set showStatus = packageCount > 0 or order.status not in ['canceled', 'other'] %}
 
-<div class="mtg-tracking__meta">
-    <span>{{ trans('CeresCoconutMTG::Template.trackingOrderMeta', {'order': order.id, 'date': order.date}) }}</span>
-    {% if order.zip %}
-        <span>{{ trans('CeresCoconutMTG::Template.trackingDeliveryTo', {'zip': order.zip, 'town': order.town}) }}</span>
-    {% endif %}
-    <a href="{{ trackingUrl }}">{{ trans('CeresCoconutMTG::Template.trackingOtherOrder') }}</a>
-</div>
+{% if packageCount > 1 %}
+    {% for package in order.packages %}
+        <input type="radio" class="mtg-sr-only mtg-package-radio" name="mtg-package" id="mtg-package-{{ loop.index }}"{% if loop.first %} checked{% endif %}>
+    {% endfor %}
+{% endif %}
+<span class="mtg-sr-only" id="mtg-tracking-live" aria-live="polite"></span>
 
-<div class="row">
-    <div class="col-12 col-lg-8">
-        {% if order.payment %}
-            {% include "CeresCoconutMTG::ShipmentTracking.Partials.Payment" with {'payment': order.payment} only %}
+<section class="mtg-hero mtg-hero--result">
+    <div class="mtg-wrap mtg-hero__inner">
+        <h1 class="mtg-sr-only">{{ trans(T ~ 'trackingTitle') }}: {{ trans(T ~ 'trackingOrderNumber', {'order': order.id}) }}</h1>
+
+        <div class="mtg-hero__bar">
+            <a class="mtg-hero__back" href="{{ trackingUrl }}">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M15 6l-6 6 6 6"></path></svg>
+                <span class="mtg-only-desktop">{{ trans(T ~ 'trackingOtherOrder') }}</span>
+                <span class="mtg-only-mobile">{{ trans(T ~ 'trackingBackShort') }}</span>
+            </a>
+            <p class="mtg-hero__meta">
+                <span class="mtg-only-desktop">
+                    {{ trans(T ~ 'trackingOrderMeta', {'order': order.id, 'date': order.date}) }}{% if order.zip %} · {{ trans(T ~ 'trackingDestination', {'zip': order.zip, 'town': order.town}) }}{% endif %}
+                </span>
+                <span class="mtg-only-mobile">{{ trans(T ~ 'trackingOrderNumber', {'order': order.id}) }}</span>
+            </p>
+        </div>
+
+        {% if packageCount > 1 %}
+            <div class="mtg-tabs mtg-glass" style="--mtg-tab-count: {{ packageCount }}">
+                {% for package in order.packages %}
+                    <label class="mtg-tab mtg-press" for="mtg-package-{{ loop.index }}">{{ trans(T ~ 'trackingPackageTab', {'index': loop.index, 'carrier': package.carrierName}) }}</label>
+                {% endfor %}
+            </div>
         {% endif %}
 
         {% if packageCount == 0 %}
-            {% set headlines = {
-                'received': ['trackingHeadlineReceived', 'trackingTextReceived'],
-                'payment': ['trackingHeadlinePayment', 'trackingTextPayment'],
-                'processing': ['trackingHeadlineProcessing', 'trackingTextProcessing'],
-                'shipped': ['trackingHeadlineShipped', 'trackingTextShipped'],
-                'canceled': ['trackingHeadlineCanceled', 'trackingTextCanceled'],
-                'other': ['trackingHeadlineOther', 'trackingTextOther']
-            } %}
-            {% set headline = headlines[order.status] %}
-
-            <section class="mtg-tracking__card">
-                <h2 class="mtg-tracking__headline">{{ trans('CeresCoconutMTG::Template.' ~ headline[0]) }}</h2>
-                <p class="mtg-tracking__text">{{ trans('CeresCoconutMTG::Template.' ~ headline[1]) }}</p>
-                {% if order.status not in ['canceled', 'other'] %}
-                    {% include "CeresCoconutMTG::ShipmentTracking.Partials.Steps" with {'stage': order.stage, 'problem': false} only %}
-                {% endif %}
-            </section>
+            <div class="mtg-hero__status">
+                {% include "CeresCoconutMTG::ShipmentTracking.Partials.Headline" with {'order': order} only %}
+            </div>
         {% else %}
             {% for package in order.packages %}
-                {% include "CeresCoconutMTG::ShipmentTracking.Partials.Package" with {
-                    'package': package,
-                    'index': loop.index,
-                    'count': packageCount
-                } only %}
+                <div class="mtg-hero__status" data-mtg-package="{{ loop.index }}">
+                    {% include "CeresCoconutMTG::ShipmentTracking.Partials.Headline" with {'package': package} only %}
+                </div>
             {% endfor %}
         {% endif %}
     </div>
+</section>
 
-    <div class="col-12 col-lg-4">
-        {% if order.items | length > 0 %}
-            <section class="mtg-tracking__card mtg-tracking__items">
-                <h2 class="mtg-tracking__subheadline">
-                    <i class="fa fa-shopping-basket" aria-hidden="true"></i>
-                    {{ trans('CeresCoconutMTG::Template.trackingItemsTitle') }}
-                </h2>
-                <ul>
-                    {% for item in order.items %}
-                        <li>
-                            <span class="mtg-tracking__quantity">{{ item.quantity | round(2) }}&nbsp;×</span>
-                            {% if item.itemId > 0 %}
-                                <a href="/a-{{ item.itemId }}">{{ item.name }}</a>
-                            {% else %}
-                                {{ item.name }}
-                            {% endif %}
-                        </li>
+<div class="mtg-wrap mtg-result">
+    <div class="mtg-result__grid">
+        {% if showStatus or order.payment %}
+            <div class="mtg-result__main">
+                {% if order.payment %}
+                    {% include "CeresCoconutMTG::ShipmentTracking.Partials.Payment" with {'payment': order.payment} only %}
+                {% endif %}
+
+                {% if packageCount == 0 %}
+                    {% if showStatus %}
+                        <section class="mtg-card mtg-card--raised mtg-status">
+                            <div class="mtg-status__top">
+                                <h2 class="mtg-card__title">{{ trans(T ~ 'trackingOrderStatusTitle') }}</h2>
+                                {% include "CeresCoconutMTG::ShipmentTracking.Partials.Steps" with {'stage': order.stage, 'problem': false} only %}
+                            </div>
+                        </section>
+                    {% endif %}
+                {% else %}
+                    {% for package in order.packages %}
+                        <div class="mtg-package" data-mtg-package="{{ loop.index }}">
+                            {% include "CeresCoconutMTG::ShipmentTracking.Partials.Package" with {'package': package, 'index': loop.index} only %}
+                        </div>
                     {% endfor %}
-                </ul>
-            </section>
+                {% endif %}
+            </div>
         {% endif %}
 
-        {% if tracking.helpUrl %}
-            <section class="mtg-tracking__card mtg-tracking__help">
-                <h2 class="mtg-tracking__subheadline">
-                    <i class="fa fa-wrench" aria-hidden="true"></i>
-                    {{ trans('CeresCoconutMTG::Template.trackingHelpTitle') }}
-                </h2>
-                <p>{{ trans('CeresCoconutMTG::Template.trackingHelpText') }}</p>
-                <a class="btn btn-mtg-accent btn-sm" href="{{ tracking.helpUrl }}">{{ trans('CeresCoconutMTG::Template.trackingHelpLink') }}</a>
+        <aside class="mtg-result__aside">
+            {% if order.items | length > 0 %}
+                <section class="mtg-card mtg-card--raised mtg-items">
+                    <div class="mtg-items__head">
+                        <h2 class="mtg-card__title">{{ trans(T ~ 'trackingItemsTitle') }}</h2>
+                        <span class="mtg-items__count">{{ trans(T ~ (order.itemCount == 1 ? 'trackingItemsCountOne' : 'trackingItemsCount'), {'count': order.itemCount}) }}</span>
+                    </div>
+                    <div class="mtg-items__box">
+                        <ul class="mtg-items__list">
+                            {% for item in order.items %}
+                                {% set quantity = item.quantity | round(2) %}
+                                <li class="mtg-item">
+                                    <span class="mtg-item__image">
+                                        {% if item.image %}
+                                            <img src="{{ item.image }}" alt="" width="64" height="64" loading="lazy" decoding="async">
+                                        {% else %}
+                                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 8l-9-5-9 5v8l9 5 9-5V8z"></path><path d="M3 8l9 5 9-5M12 13v8"></path></svg>
+                                        {% endif %}
+                                    </span>
+                                    <span class="mtg-item__body">
+                                        {% if item.itemId > 0 %}
+                                            <a class="mtg-item__name" href="/a-{{ item.itemId }}">{{ item.name }}</a>
+                                        {% else %}
+                                            <span class="mtg-item__name">{{ item.name }}</span>
+                                        {% endif %}
+                                        {% if item.attributes %}
+                                            <span class="mtg-item__attributes">{{ item.attributes }}</span>
+                                        {% endif %}
+                                        <span class="mtg-item__qty">{{ trans(T ~ 'trackingQuantity', {'quantity': quantity}) }}</span>
+                                    </span>
+                                    <span class="mtg-item__qty-short">{{ quantity }}&nbsp;×</span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                        {% if order.zip %}
+                            <p class="mtg-items__destination">
+                                <span>{{ trans(T ~ 'trackingDeliveryToLabel') }}</span>
+                                <span>{{ order.zip }} {{ order.town }}</span>
+                            </p>
+                        {% endif %}
+                    </div>
+                </section>
+            {% endif %}
+
+            <section class="mtg-contact">
+                <h2 class="mtg-contact__title">{{ trans(T ~ 'trackingContactTitle') }}</h2>
+                <p class="mtg-contact__text">{{ trans(T ~ 'trackingContactText') }}</p>
+                <a class="mtg-contact__link" href="{{ urls.contact | default('/contact') }}">{{ trans(T ~ 'trackingContactLink') }}&nbsp;›</a>
             </section>
-        {% endif %}
+
+            {% if tracking.helpUrl %}
+                <section class="mtg-card mtg-help">
+                    <span class="mtg-feature__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"></path></svg></span>
+                    <h2 class="mtg-help__title">{{ trans(T ~ 'trackingHelpTitle') }}</h2>
+                    <p class="mtg-help__text">{{ trans(T ~ 'trackingHelpText') }}</p>
+                    <a class="mtg-help__link" href="{{ tracking.helpUrl }}">{{ trans(T ~ 'trackingHelpLink') }}&nbsp;›</a>
+                </section>
+            {% endif %}
+        </aside>
     </div>
 </div>

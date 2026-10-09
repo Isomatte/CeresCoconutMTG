@@ -4,10 +4,14 @@
    kommen als "tracking" (siehe Controller und ShipmentTrackingService):
    result = form | found | notFound | invalid | locked | disabled.
 
+   Design nach dem Entwurf "Sendungsverfolgung Redesign" (B · Suche, E · Ergebnis
+   Desktop/Mobil): dunkler Seitenkopf ueber die ganze Breite, darunter Karten.
+
    Ceres mountet Vue ueber die ganze Seite. Alles mit Daten von Paketdiensten oder aus
    der Bestellung steht deshalb in einem v-pre-Block, damit Vue darin keine
    Ausdruecke auswertet. Nur die Empfehlungen brauchen Vue (category-item) und stehen
-   ausserhalb. Styles stehen im Head, weil Vue <style> im Seiteninhalt entfernt. #}
+   ausserhalb. Styles und Skript stehen im Head, weil Vue <style> und <script> im
+   Seiteninhalt entfernt. #}
 
 {% extends getPartial('page-design') %}
 
@@ -16,25 +20,27 @@
     <meta name="description" content="{{ trans('CeresCoconutMTG::Template.trackingMetaDescription') }}">
     <meta name="robots" content="noindex, nofollow">
     {% include "CeresCoconutMTG::ShipmentTracking.Partials.Styles" %}
+    {% include "CeresCoconutMTG::ShipmentTracking.Partials.Script" %}
 {% endblock %}
 
 {% block PageBody %}
     {% set trackingUrl = urls.appendTrailingSlash ? '/sendungsverfolgung/' : '/sendungsverfolgung' %}
+    {% set found = tracking.result == "found" %}
 
-    <div class="container-max page-content mtg-tracking">
-        <div class="mtg-tracking__main" v-pre>
-            <h1 class="mtg-tracking__title">{{ trans('CeresCoconutMTG::Template.trackingTitle') }}</h1>
-            <span class="mtg-tracking__kicker">{{ trans('CeresCoconutMTG::Template.trackingKicker') }}</span>
-
-            {% if tracking.result == "found" %}
+    <div class="mtg-tracking {{ found ? 'mtg-tracking--result' : 'mtg-tracking--search' }}">
+        <div class="mtg-static" v-pre>
+            {% if found %}
                 {% include "CeresCoconutMTG::ShipmentTracking.Partials.Result" %}
             {% else %}
                 {% include "CeresCoconutMTG::ShipmentTracking.Partials.Form" %}
             {% endif %}
         </div>
 
-        {% if tracking.recommendations | length > 0 %}
-            {% include "CeresCoconutMTG::ShipmentTracking.Partials.Recommendations" %}
+        {% if found %}
+            {% if tracking.recommendations | length > 0 %}
+                {% include "CeresCoconutMTG::ShipmentTracking.Partials.Recommendations" %}
+            {% endif %}
+            <p class="mtg-wrap mtg-ordered-on">{{ trans('CeresCoconutMTG::Template.trackingOrderedOn', {'date': tracking.order.date}) }}</p>
         {% endif %}
     </div>
 {% endblock %}

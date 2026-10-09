@@ -1,5 +1,14 @@
 # Release Notes for CeresCoconutMTG
 
+## v1.0.11 (2026-10-09)
+
+### Changed
+
+- New design of the shipment tracking page based on the "Sendungsverfolgung Redesign" draft: dark full-width header, search with order number and postcode side by side, three hints below.
+- Result: delivery day and time window in large type in the header, switch between several packages (without JavaScript), "Shipment status" card with progress, copyable tracking number and carrier link, tracking history grouped by day, next to it "Your order" with item images and "Questions about your delivery?".
+- Separate mobile layout with grouped lists.
+- Recommendations as a swipeable row with arrow buttons instead of a carousel.
+
 ## v1.0.10 (2026-10-08)
 
 ### Added

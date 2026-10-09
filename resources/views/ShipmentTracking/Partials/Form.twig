@@ -1,60 +1,100 @@
-{# Suchformular der Sendungsverfolgung. Postet auf dieselbe Seite. #}
+{# Suchformular der Sendungsverfolgung (Entwurf "B · Suche"): dunkler Kopf mit dem
+   Formular, darunter drei Hinweise, was die Seite zeigt. Postet auf dieselbe Seite.
 
-<div class="row">
-    <div class="col-12 col-md-8 col-lg-6">
-        <p class="mtg-tracking__lead">{{ trans('CeresCoconutMTG::Template.trackingIntro') }}</p>
+   Bewusst ohne .input-unit: das Theme-JS kopiert dort das Label in den Platzhalter,
+   hier stehen Label und Beispiel getrennt. #}
 
-        {% if tracking.result == "notFound" %}
-            <div class="alert alert-danger" role="alert">{{ trans('CeresCoconutMTG::Template.trackingErrorNotFound') }}</div>
-        {% elseif tracking.result == "invalid" %}
-            <div class="alert alert-danger" role="alert">{{ trans('CeresCoconutMTG::Template.trackingErrorInvalid') }}</div>
-        {% elseif tracking.result == "locked" %}
-            <div class="alert alert-warning" role="alert">{{ trans('CeresCoconutMTG::Template.trackingErrorLocked') }}</div>
-        {% elseif tracking.result == "disabled" %}
-            <div class="alert alert-info" role="status">{{ trans('CeresCoconutMTG::Template.trackingDisabled') }}</div>
+{% set T = 'CeresCoconutMTG::Template.' %}
+{% set alerts = {
+    'notFound': ['error', 'trackingErrorNotFound'],
+    'invalid': ['error', 'trackingErrorInvalid'],
+    'locked': ['warning', 'trackingErrorLocked'],
+    'disabled': ['info', 'trackingDisabled']
+} %}
+{% set alert = tracking.result in alerts | keys ? alerts[tracking.result] : null %}
+{% set enabled = tracking.result != "disabled" %}
+
+<section class="mtg-hero mtg-hero--search">
+    <svg class="mtg-hero__route" viewBox="0 0 1280 400" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+        <path d="M-20 320 C 220 300, 300 140, 520 170 S 840 330, 1000 220 S 1200 90, 1300 110" fill="none" stroke="#E04B00" stroke-width="3" stroke-linecap="round" opacity=".9"></path>
+        <path d="M-20 320 C 220 300, 300 140, 520 170 S 840 330, 1000 220 S 1200 90, 1300 110" fill="none" stroke="#E04B00" stroke-width="18" stroke-linecap="round" opacity=".12"></path>
+        <circle cx="520" cy="170" r="9" fill="#FFFFFF"></circle>
+        <circle cx="520" cy="170" r="20" fill="#FFFFFF" opacity=".12"></circle>
+        <circle cx="1000" cy="220" r="7" fill="#FF8A4C"></circle>
+        <circle cx="220" cy="292" r="6" fill="#FF8A4C"></circle>
+    </svg>
+
+    <div class="mtg-wrap mtg-wrap--narrow mtg-search">
+        <header class="mtg-search__head">
+            <p class="mtg-kicker">{{ trans(T ~ 'trackingTitle') }}</p>
+            <h1 class="mtg-search__title">{{ trans(T ~ 'trackingKicker') }}</h1>
+            {% if enabled %}
+                <p class="mtg-search__lead">{{ trans(T ~ 'trackingIntro') }}</p>
+            {% endif %}
+        </header>
+
+        {% if alert %}
+            <div class="mtg-alert mtg-alert--{{ alert[0] }}" role="{{ alert[0] == 'info' ? 'status' : 'alert' }}">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5v5.5M12 16.5h.01"></path></svg>
+                <span>{{ trans(T ~ alert[1]) }}</span>
+            </div>
         {% endif %}
 
-        {% if tracking.result != "disabled" %}
-            <form class="mtg-tracking__form" method="post" action="{{ trackingUrl }}">
-                <div class="input-unit required">
-                    <input type="text" name="order" id="mtg-tracking-order" value="{{ tracking.orderInput }}"
+        {% if enabled %}
+            <form class="mtg-form mtg-glass" method="post" action="{{ trackingUrl }}">
+                <div class="mtg-field mtg-field--order">
+                    <label class="mtg-field__label" for="mtg-tracking-order">{{ trans(T ~ 'trackingFieldOrder') }}</label>
+                    <input class="mtg-field__input" type="text" name="order" id="mtg-tracking-order" value="{{ tracking.orderInput }}"
                            inputmode="numeric" autocomplete="off" maxlength="30" required
+                           placeholder="{{ trans(T ~ 'trackingFieldOrderPlaceholder') }}"
                            aria-describedby="mtg-tracking-order-hint">
-                    <label for="mtg-tracking-order">{{ trans('CeresCoconutMTG::Template.trackingFieldOrder') }}*</label>
+                    <span class="mtg-field__hint" id="mtg-tracking-order-hint">{{ trans(T ~ 'trackingFieldOrderHint') }}</span>
                 </div>
-                <p class="mtg-tracking__hint" id="mtg-tracking-order-hint">{{ trans('CeresCoconutMTG::Template.trackingFieldOrderHint') }}</p>
 
-                <div class="input-unit required">
-                    <input type="text" name="zip" id="mtg-tracking-zip"
+                <div class="mtg-field mtg-field--zip">
+                    <label class="mtg-field__label" for="mtg-tracking-zip">{{ trans(T ~ 'trackingFieldZip') }}</label>
+                    <input class="mtg-field__input" type="text" name="zip" id="mtg-tracking-zip"
                            autocomplete="postal-code" maxlength="10" required
+                           placeholder="{{ trans(T ~ 'trackingFieldZipPlaceholder') }}"
                            aria-describedby="mtg-tracking-zip-hint">
-                    <label for="mtg-tracking-zip">{{ trans('CeresCoconutMTG::Template.trackingFieldZip') }}*</label>
+                    <span class="mtg-field__hint" id="mtg-tracking-zip-hint">{{ trans(T ~ 'trackingFieldZipHint') }}</span>
                 </div>
-                <p class="mtg-tracking__hint" id="mtg-tracking-zip-hint">{{ trans('CeresCoconutMTG::Template.trackingFieldZipHint') }}</p>
 
-                <button type="submit" class="btn btn-mtg-accent btn-block">
-                    <i class="fa fa-search" aria-hidden="true"></i>
-                    {{ trans('CeresCoconutMTG::Template.trackingSubmit') }}
-                </button>
+                <div class="mtg-field mtg-field--submit">
+                    <span class="mtg-field__label mtg-field__spacer" aria-hidden="true">&nbsp;</span>
+                    <button type="submit" class="mtg-submit mtg-press">
+                        {{ trans(T ~ 'trackingSubmit') }}
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+                    </button>
+                </div>
             </form>
-
-            <p class="mtg-tracking__account">
-                {{ trans('CeresCoconutMTG::Template.trackingAccountHint') }}
-                <a href="{{ urls.myAccount | default('/my-account') }}">{{ trans('CeresCoconutMTG::Template.trackingMyAccount') }}</a>
-            </p>
         {% endif %}
     </div>
+</section>
 
-    {% if tracking.result != "disabled" %}
-        <div class="col-12 col-md-8 col-lg-5 offset-lg-1">
-            <aside class="mtg-tracking__benefits">
-                <h2 class="mtg-tracking__subheadline mt-0">{{ trans('CeresCoconutMTG::Template.trackingBenefitsTitle') }}</h2>
-                <ul>
-                    <li><i class="fa fa-truck" aria-hidden="true"></i>{{ trans('CeresCoconutMTG::Template.trackingBenefitCarrier') }}</li>
-                    <li><i class="fa fa-clock-o" aria-hidden="true"></i>{{ trans('CeresCoconutMTG::Template.trackingBenefitWindow') }}</li>
-                    <li><i class="fa fa-wrench" aria-hidden="true"></i>{{ trans('CeresCoconutMTG::Template.trackingBenefitHelp') }}</li>
-                </ul>
-            </aside>
+{% if enabled %}
+    <section class="mtg-wrap mtg-wrap--narrow mtg-features">
+        <div class="mtg-features__grid">
+            <div class="mtg-feature">
+                <span class="mtg-feature__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 8l-9-5-9 5v8l9 5 9-5V8z"></path><path d="M3 8l9 5 9-5M12 13v8"></path></svg></span>
+                <h2 class="mtg-feature__title">{{ trans(T ~ 'trackingBenefitCarrierTitle') }}</h2>
+                <p class="mtg-feature__text">{{ trans(T ~ 'trackingBenefitCarrier') }}</p>
+            </div>
+            <div class="mtg-feature">
+                <span class="mtg-feature__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg></span>
+                <h2 class="mtg-feature__title">{{ trans(T ~ 'trackingBenefitWindowTitle') }}</h2>
+                <p class="mtg-feature__text">{{ trans(T ~ 'trackingBenefitWindow') }}</p>
+            </div>
+            <div class="mtg-feature">
+                <span class="mtg-feature__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"></path></svg></span>
+                <h2 class="mtg-feature__title">{{ trans(T ~ 'trackingBenefitHelpTitle') }}</h2>
+                <p class="mtg-feature__text">{{ trans(T ~ 'trackingBenefitHelp') }}</p>
+            </div>
         </div>
-    {% endif %}
-</div>
+
+        <p class="mtg-features__account">
+            {{ trans(T ~ 'trackingAccountHint') }}
+            <a href="{{ urls.myAccount | default('/my-account') }}">{{ trans(T ~ 'trackingMyAccount') }}&nbsp;›</a>
+        </p>
+    </section>
+{% endif %}

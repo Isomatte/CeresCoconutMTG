@@ -1,0 +1,83 @@
+{# Kleines Skript der Sendungsverfolgung, im Head eingebunden (Vue entfernt <script> im
+   Seiteninhalt). Klicks werden am document abgefangen, damit es egal ist, wann Vue die
+   Seite rendert oder hydriert.
+
+   - mtg-js an <html>: Kopier-Button und Blaetterpfeile erscheinen nur mit JavaScript.
+   - [data-mtg-copy]: Sendungsnummer in die Zwischenablage kopieren.
+   - [data-mtg-scroll]: Empfehlungsreihe (aria-controls) um ca. eine Breite blaettern.
+
+   Paket-Umschalter und "Alle Ereignisse" funktionieren ohne Skript (Radiobuttons bzw.
+   Checkbox, siehe Styles.twig). #}
+
+<script>
+(function () {
+    var root = document.documentElement;
+    root.className += ' mtg-js';
+
+    function announce(text) {
+        var live = document.getElementById('mtg-tracking-live');
+        if (!live || !text) {
+            return;
+        }
+        live.textContent = '';
+        window.setTimeout(function () { live.textContent = text; }, 50);
+    }
+
+    function copyText(text) {
+        if (navigator.clipboard && window.isSecureContext) {
+            return navigator.clipboard.writeText(text);
+        }
+
+        return new Promise(function (resolve, reject) {
+            var field = document.createElement('textarea');
+            field.value = text;
+            field.setAttribute('readonly', '');
+            field.style.position = 'fixed';
+            field.style.opacity = '0';
+            document.body.appendChild(field);
+            field.select();
+            var copied = false;
+            try {
+                copied = document.execCommand('copy');
+            } catch (error) {
+                copied = false;
+            }
+            document.body.removeChild(field);
+            if (copied) {
+                resolve();
+            } else {
+                reject();
+            }
+        });
+    }
+
+    document.addEventListener('click', function (event) {
+        var target = event.target;
+        if (!target || !target.closest) {
+            return;
+        }
+
+        var copyButton = target.closest('[data-mtg-copy]');
+        if (copyButton) {
+            copyText(copyButton.getAttribute('data-mtg-copy')).then(function () {
+                copyButton.classList.add('is-copied');
+                announce(copyButton.getAttribute('data-mtg-copied'));
+                window.setTimeout(function () { copyButton.classList.remove('is-copied'); }, 2000);
+            }, function () {});
+            return;
+        }
+
+        var scrollButton = target.closest('[data-mtg-scroll]');
+        if (scrollButton) {
+            var track = document.getElementById(scrollButton.getAttribute('aria-controls'));
+            if (track) {
+                var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                track.scrollBy({
+                    left: Number(scrollButton.getAttribute('data-mtg-scroll')) * track.clientWidth * 0.8,
+                    behavior: reduceMotion ? 'auto' : 'smooth'
+                });
+            }
+        }
+    });
+})();
+</script>

@@ -1,20 +1,26 @@
 {# Fortschrittsanzeige mit fuenf Stufen (TrackingNormalizer::STAGE_*).
-   Erwartet stage (0-4) und problem. #}
+   Erwartet stage (0-4) und problem. Die Linien links und rechts vom Symbol sind
+   orange, solange die Stufe erreicht ist. #}
 
+{% set T = 'CeresCoconutMTG::Template.' %}
 {% set steps = [
-    {'icon': 'fa-shopping-cart', 'label': 'trackingStepOrdered'},
-    {'icon': 'fa-archive', 'label': 'trackingStepPacked'},
-    {'icon': 'fa-truck', 'label': 'trackingStepInTransit'},
-    {'icon': 'fa-map-marker', 'label': 'trackingStepOutForDelivery'},
-    {'icon': 'fa-home', 'label': 'trackingStepDelivered'}
+    {'label': 'trackingStepOrdered', 'icon': '<circle cx="9" cy="20" r="1.5"></circle><circle cx="18" cy="20" r="1.5"></circle><path d="M2 3h3l2.5 12h11L21 7H6.2"></path>'},
+    {'label': 'trackingStepPacked', 'icon': '<path d="M21 8l-9-5-9 5v8l9 5 9-5V8z"></path><path d="M3 8l9 5 9-5M12 13v8"></path>'},
+    {'label': 'trackingStepInTransit', 'icon': '<path d="M1 6h13v10H1z"></path><path d="M14 9h4l3 3v4h-7z"></path><circle cx="5.5" cy="17.5" r="1.8"></circle><circle cx="17.5" cy="17.5" r="1.8"></circle>'},
+    {'label': 'trackingStepOutForDelivery', 'icon': '<path d="M12 21s-7-6.5-7-12a7 7 0 0 1 14 0c0 5.5-7 12-7 12z"></path><circle cx="12" cy="9" r="2.5"></circle>'},
+    {'label': 'trackingStepDelivered', 'icon': '<path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"></path>'}
 ] %}
 
-<ol class="mtg-steps{% if problem %} has-problem{% endif %}" aria-label="{{ trans('CeresCoconutMTG::Template.trackingProgress') }}">
+<ol class="mtg-steps{% if problem %} has-problem{% endif %}" aria-label="{{ trans(T ~ 'trackingProgressStep', {'step': stage + 1, 'count': steps | length}) }}">
     {% for step in steps %}
         {% set index = loop.index0 %}
-        <li class="mtg-steps__step{% if index <= stage %} is-done{% endif %}{% if index == stage %} is-current{% endif %}"{% if index == stage %} aria-current="step"{% endif %}>
-            <span class="mtg-steps__icon"><i class="fa {{ step.icon }}" aria-hidden="true"></i></span>
-            <span class="mtg-steps__label">{{ trans('CeresCoconutMTG::Template.' ~ step.label) }}</span>
+        <li class="mtg-steps__step{% if index <= stage %} is-done{% endif %}{% if index < stage %} is-passed{% endif %}{% if index == stage %} is-current{% endif %}"{% if index == stage %} aria-current="step"{% endif %}>
+            <span class="mtg-steps__track" aria-hidden="true">
+                <span class="mtg-steps__line mtg-steps__line--before"></span>
+                <span class="mtg-steps__icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" focusable="false">{{ step.icon | raw }}</svg></span>
+                <span class="mtg-steps__line mtg-steps__line--after"></span>
+            </span>
+            <span class="mtg-steps__label">{{ trans(T ~ step.label) }}</span>
         </li>
     {% endfor %}
 </ol>

@@ -1,14 +1,30 @@
-{# Cross-Selling (Verknuepfung "Zubehoer") zu den bestellten Artikeln.
-   Gleiches Markup wie die Empfehlungen im Warenkorb-Overlay (PageDesign.twig), damit
-   die Kacheln aussehen wie im restlichen Shop. Steht ausserhalb von v-pre, weil
-   carousel und category-item Vue-Komponenten sind. #}
+{# Cross-Selling (Verknuepfung "Zubehoer") zu den bestellten Artikeln als waagerecht
+   wischbare Reihe. Die Kacheln sind die Ceres-Komponente category-item (Preis,
+   Grundpreis, Warenkorb-Button wie im restlichen Shop), Styles.twig passt nur die
+   Optik an. Steht ausserhalb von v-pre, weil category-item eine Vue-Komponente ist.
+   Die Pfeile blaettern per Script.twig und erscheinen nur mit JavaScript. #}
 
-<section class="mtg-tracking__recommendations">
-    <h2 class="mtg-tracking__headline">{{ trans('CeresCoconutMTG::Template.trackingRecommendationsTitle') }}</h2>
+{% set T = 'CeresCoconutMTG::Template.' %}
 
-    <carousel :items-per-page="4">
+<section class="mtg-wrap mtg-recos" aria-labelledby="mtg-recos-title">
+    <div class="mtg-recos__head">
+        <div>
+            <h2 class="mtg-recos__title" id="mtg-recos-title">{{ trans(T ~ 'trackingRecommendationsTitle') }}</h2>
+            <p class="mtg-recos__lead">{{ trans(T ~ 'trackingRecommendationsLead') }}</p>
+        </div>
+        <div class="mtg-recos__nav">
+            <button type="button" class="mtg-round-btn mtg-press" data-mtg-scroll="-1" aria-controls="mtg-recos-track" aria-label="{{ trans(T ~ 'trackingPrevious') }}">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M15 6l-6 6 6 6"></path></svg>
+            </button>
+            <button type="button" class="mtg-round-btn mtg-press" data-mtg-scroll="1" aria-controls="mtg-recos-track" aria-label="{{ trans(T ~ 'trackingNext') }}">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 6l6 6-6 6"></path></svg>
+            </button>
+        </div>
+    </div>
+
+    <div class="mtg-recos__track" id="mtg-recos-track">
         {% for item in tracking.recommendations %}
-            <template slot="items">
+            <div class="mtg-recos__card">
                 <category-item
                     item-data-ref="{{ item.data | json_data }}"
                     :decimal-count="{{ ceresConfig.item.storeSpecial | default(0) }}">
@@ -17,7 +33,7 @@
                         <span>{{ item.data | itemName }}</span>
                     </a>
                 </category-item>
-            </template>
+            </div>
         {% endfor %}
-    </carousel>
+    </div>
 </section>

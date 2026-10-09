@@ -1,5 +1,14 @@
 # Release Notes für CeresCoconutMTG
 
+## v1.0.11 (2026-10-09)
+
+### Geändert
+
+- Neues Design der Sendungsverfolgung nach dem Entwurf "Sendungsverfolgung Redesign": dunkler Seitenkopf über die ganze Breite, Suche mit Bestellnummer und Postleitzahl nebeneinander, darunter drei Hinweise.
+- Ergebnis: Zustelltag und Zeitfenster groß im Kopf, Umschalter zwischen mehreren Paketen (ohne JavaScript), Karte "Sendungsstatus" mit Fortschritt, Sendungsnummer (kopierbar) und Link zum Paketdienst, Sendungsverlauf nach Tagen gruppiert, daneben "Ihre Bestellung" mit Artikelbildern und "Fragen zur Lieferung?".
+- Eigenes Mobil-Layout mit gruppierten Listen.
+- Empfehlungen als wischbare Reihe mit Blätterpfeilen statt Karussell.
+
 ## v1.0.10 (2026-10-08)
 
 ### Hinzugefügt

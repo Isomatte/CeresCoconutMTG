@@ -4,12 +4,12 @@
 {% set T = 'CeresCoconutMTG::Template.' %}
 {% set amount = payment.open | number_format(2, ',', '.') ~ ' ' ~ (payment.currency == 'EUR' ? '€' : payment.currency) %}
 
-<section class="mtg-tracking__payment" role="status">
-    <h2 class="mtg-tracking__subheadline">
-        <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
-        {{ trans(T ~ 'trackingPaymentTitle') }}
-    </h2>
-    <p>{{ trans(T ~ (payment.state == 'partlyPaid' ? 'trackingPaymentPartly' : 'trackingPaymentUnpaid'), {'amount': amount}) }}</p>
-    <p>{{ trans(T ~ (payment.bankTransfer ? 'trackingPaymentBankTransfer' : 'trackingPaymentOther')) }}</p>
-    <p class="mb-0"><a href="{{ urls.contact }}">{{ trans(T ~ 'trackingPaymentContact') }}</a></p>
+<section class="mtg-card mtg-card--raised mtg-notice" role="status">
+    <span class="mtg-notice__icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5v5.5M12 16.5h.01"></path></svg></span>
+    <div class="mtg-notice__body">
+        <h2 class="mtg-notice__title">{{ trans(T ~ 'trackingPaymentTitle') }}</h2>
+        <p class="mtg-notice__text">{{ trans(T ~ (payment.state == 'partlyPaid' ? 'trackingPaymentPartly' : 'trackingPaymentUnpaid'), {'amount': amount}) }}</p>
+        <p class="mtg-notice__text">{{ trans(T ~ (payment.bankTransfer ? 'trackingPaymentBankTransfer' : 'trackingPaymentOther')) }}</p>
+        <a class="mtg-notice__link" href="{{ urls.contact }}">{{ trans(T ~ 'trackingPaymentContact') }}&nbsp;›</a>
+    </div>
 </section>

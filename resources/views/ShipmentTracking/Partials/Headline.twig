@@ -1,0 +1,77 @@
+{# Statuszeile im dunklen Kopf: kleine Zeile, Tag bzw. Stand in gross, darunter Uhrzeit
+   oder Zeitfenster und bei Bedarf eine Erklaerung.
+   Erwartet package (Format aus TrackingNormalizer) oder order (ohne Paketnummer). #}
+
+{% set T = 'CeresCoconutMTG::Template.' %}
+{% set kicker = trans(T ~ 'trackingStatusTitle') %}
+{% set big = '' %}
+{% set sub = '' %}
+{% set text = '' %}
+
+{% if package is defined and package %}
+    {% set estimated = package.estimated %}
+
+    {% if package.state == 'returned' %}
+        {% set big = trans(T ~ 'trackingHeroReturned') %}
+        {% set text = trans(T ~ 'trackingTextReturned') %}
+    {% elseif package.stage == 4 %}
+        {% set delivered = package.deliveredAt %}
+        {% if delivered and delivered.label %}
+            {# dateLabel: "heute", "gestern" oder "Montag, 05.10." #}
+            {% set day = delivered.label | split(', ') %}
+            {% set kicker = trans(T ~ 'trackingStepDelivered') %}
+            {% set big = day[0] | capitalize %}
+            {% set sub = day | length > 1 ? day[1] : '' %}
+            {% if delivered.time %}
+                {% set sub = (sub ? sub ~ ' · ' : '') ~ trans(T ~ 'trackingEventTime', {'time': delivered.time}) %}
+            {% endif %}
+        {% else %}
+            {% set big = trans(T ~ 'trackingStepDelivered') %}
+        {% endif %}
+        {% if package.deliveryLocation and package.deliveryLocation | lower not in ['privat', 'residential'] %}
+            {% set text = trans(T ~ 'trackingDeliveryLocation', {'location': package.deliveryLocation}) %}
+        {% endif %}
+    {% elseif package.state == 'problem' %}
+        {% set big = trans(T ~ 'trackingHeroProblem') %}
+        {% set text = trans(T ~ 'trackingTextProblem', {'message': package.message}) %}
+    {% elseif estimated and estimated.label %}
+        {% set day = estimated.label | split(', ') %}
+        {% set kicker = trans(T ~ (package.stage == 3 ? 'trackingStepOutForDelivery' : 'trackingHeroEstimated')) %}
+        {% set big = day[0] | capitalize %}
+        {% set sub = day | length > 1 ? day[1] : '' %}
+        {% if estimated.from and estimated.to %}
+            {% set sub = (sub ? sub ~ ' · ' : '') ~ trans(T ~ 'trackingHeroWindow', {'from': estimated.from, 'to': estimated.to}) %}
+        {% endif %}
+    {% elseif package.stage == 3 %}
+        {% set kicker = trans(T ~ 'trackingStepOutForDelivery') %}
+        {% set big = trans(T ~ 'trackingHeroToday') %}
+    {% elseif package.stage == 2 %}
+        {% set big = trans(T ~ 'trackingStepInTransit') %}
+        {% set text = trans(T ~ 'trackingHeroNoEstimate', {'carrier': package.carrierName}) %}
+    {% else %}
+        {% set big = trans(T ~ 'trackingStepPacked') %}
+        {% set text = package.error ? trans(T ~ 'trackingTextError') : trans(T ~ 'trackingTextPacked', {'carrier': package.carrierName}) %}
+    {% endif %}
+{% else %}
+    {% set statusKeys = {
+        'received': 'Received',
+        'payment': 'Payment',
+        'processing': 'Processing',
+        'shipped': 'Shipped',
+        'canceled': 'Canceled',
+        'other': 'Other'
+    } %}
+    {% set key = statusKeys[order.status] %}
+    {% set kicker = trans(T ~ 'trackingOrderStatusTitle') %}
+    {% set big = trans(T ~ 'trackingHero' ~ key) %}
+    {% set text = trans(T ~ 'trackingText' ~ key) %}
+{% endif %}
+
+<p class="mtg-hero__kicker">{{ kicker }}</p>
+<p class="mtg-hero__big">{{ big }}</p>
+{% if sub %}
+    <p class="mtg-hero__sub">{{ sub }}</p>
+{% endif %}
+{% if text %}
+    <p class="mtg-hero__text">{{ text }}</p>
+{% endif %}

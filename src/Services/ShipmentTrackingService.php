@@ -5,6 +5,8 @@ namespace CeresCoconutMTG\Services;
 use CeresCoconutMTG\Helpers\TrackingNormalizer;
 use IO\Services\ItemListService;
 use Plenty\Modules\Authorization\Services\AuthHelper;
+use Plenty\Modules\Item\ItemImage\Contracts\ItemImageRepositoryContract;
+use Plenty\Modules\Item\ItemImage\Models\ItemImage;
 use Plenty\Modules\Item\Variation\Contracts\VariationRepositoryContract;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Order\Shipping\ParcelService\Contracts\ParcelServicePresetRepositoryContract;
@@ -57,6 +59,9 @@ class ShipmentTrackingService
     const ADDRESS_TYPE_DELIVERY = 2;
     /** Auftragspositionen, die der Kunde sieht: Variante, Artikelpaket. */
     const ORDER_ITEM_TYPES_SHOWN = [1, 2];
+
+    /** Artikelbilder aendern sich selten. */
+    const IMAGE_CACHE_MINUTES = 1440;
 
     const MAX_RECOMMENDATIONS = 8;
     /** Fuer so viele bestellte Artikel werden Cross-Selling-Artikel gesucht. */
@@ -355,6 +360,7 @@ class ShipmentTrackingService
 
         $items = [];
         $variationIds = [];
+        $itemCount = 0.0;
         foreach ($this->toIterable($order->orderItems) as $orderItem) {
             if (!in_array((int)$orderItem->typeId, self::ORDER_ITEM_TYPES_SHOWN, true)) {
                 continue;
@@ -363,16 +369,22 @@ class ShipmentTrackingService
             $variationId = (int)$orderItem->itemVariationId;
             $items[] = [
                 'name' => (string)$orderItem->orderItemName,
+                // z. B. "2.000 mm, F1 Aluminium silberfarben"
+                'attributes' => trim((string)$orderItem->attributeValues),
                 'quantity' => (float)$orderItem->quantity,
                 'variationId' => $variationId,
-                'itemId' => 0
+                'itemId' => 0,
+                'image' => ''
             ];
             $variationIds[] = $variationId;
+            $itemCount += (float)$orderItem->quantity;
         }
 
         $itemIds = $this->getItemIds($variationIds);
         foreach ($items as $index => $item) {
-            $items[$index]['itemId'] = $itemIds[$item['variationId']] ?? 0;
+            $itemId = $itemIds[$item['variationId']] ?? 0;
+            $items[$index]['itemId'] = $itemId;
+            $items[$index]['image'] = $this->getImageUrl($item['variationId'], $itemId);
         }
 
         $packages = [];
@@ -391,6 +403,7 @@ class ShipmentTrackingService
             'status' => $this->getOrderStatus((float)$order->statusId),
             'stage' => $this->getOrderStage((float)$order->statusId, $packages),
             'items' => $items,
+            'itemCount' => round($itemCount, 2),
             'itemIds' => $this->uniqueItemIds($itemIds),
             'packages' => $packages,
             'payment' => $this->getOpenPayment($order)
@@ -742,6 +755,118 @@ class ShipmentTrackingService
         }
 
         return $itemIds;
+    }
+
+    /**
+     * Vorschaubild fuer "Ihre Bestellung": Bild der Variante, sonst das erste Bild des
+     * Artikels. Zwischengespeichert je Variante, auch wenn es keins gibt.
+     *
+     * @param int $variationId
+     * @param int $itemId
+     * @return string URL oder leer (die Seite zeigt dann ein Paketsymbol)
+     */
+    private function getImageUrl(int $variationId, int $itemId): string
+    {
+        if ($variationId <= 0) {
+            return '';
+        }
+
+        $cacheKey = self::CACHE_PREFIX . 'image_' . $variationId;
+        $cached = $this->cache->get($cacheKey);
+        if (is_string($cached)) {
+            return $cached;
+        }
+
+        $url = '';
+        try {
+            /** @var AuthHelper $authHelper */
+            $authHelper = pluginApp(AuthHelper::class);
+            /** @var ItemImageRepositoryContract $imageRepository */
+            $imageRepository = pluginApp(ItemImageRepositoryContract::class);
+
+            $images = $authHelper->processUnguarded(function () use ($imageRepository, $variationId) {
+                return $imageRepository->findByVariationId($variationId);
+            });
+            $url = $this->pickImageUrl($images);
+
+            if (!strlen($url) && $itemId > 0) {
+                $images = $authHelper->processUnguarded(function () use ($imageRepository, $itemId) {
+                    return $imageRepository->findByItemId($itemId);
+                });
+                $url = $this->pickImageUrl($images);
+            }
+        } catch (\Throwable $exception) {
+            // Bilder sind Beiwerk: ohne Bild zeigt die Seite ein Paketsymbol.
+            $url = '';
+        }
+
+        $this->cache->put($cacheKey, $url, self::IMAGE_CACHE_MINUTES);
+
+        return $url;
+    }
+
+    /**
+     * Bild mit der kleinsten Position, das fuer diesen Shop freigegeben ist.
+     *
+     * @param mixed $images Ergebnis von ItemImageRepositoryContract::findBy...
+     * @return string
+     */
+    private function pickImageUrl($images): string
+    {
+        /** @var Application $application */
+        $application = pluginApp(Application::class);
+        $plentyId = (int)$application->getPlentyId();
+
+        $url = '';
+        $bestPosition = null;
+        foreach ($this->toIterable($images) as $image) {
+            if ($image instanceof ItemImage) {
+                $image = $image->toArray();
+            }
+            if (!is_array($image) || !$this->isImageForShop($image, $plentyId)) {
+                continue;
+            }
+
+            $imageUrl = (string)($image['urlPreview'] ?? '');
+            if (!strlen($imageUrl)) {
+                $imageUrl = (string)($image['urlMiddle'] ?? ($image['url'] ?? ''));
+            }
+
+            $position = (int)($image['position'] ?? 0);
+            if (strlen($imageUrl) && ($bestPosition === null || $position < $bestPosition)) {
+                $bestPosition = $position;
+                $url = $imageUrl;
+            }
+        }
+
+        return $url;
+    }
+
+    /**
+     * Bilder koennen auf Mandanten und Maerkte beschraenkt sein (z. B. nur fuer einen
+     * Marktplatz). Sind Freigaben mitgeliefert, muss der eigene Mandant dabei sein.
+     *
+     * @param array $image
+     * @param int $plentyId
+     * @return bool
+     */
+    private function isImageForShop(array $image, int $plentyId): bool
+    {
+        $availabilities = $this->toIterable($image['availabilities'] ?? []);
+        $hasAvailabilities = false;
+
+        foreach ($availabilities as $availability) {
+            if (!is_array($availability)) {
+                continue;
+            }
+            $hasAvailabilities = true;
+
+            if ((string)($availability['type'] ?? '') === 'mandant' && (int)($availability['value'] ?? 0) === $plentyId) {
+                return true;
+            }
+        }
+
+        return !$hasAvailabilities;
     }
 
     /**

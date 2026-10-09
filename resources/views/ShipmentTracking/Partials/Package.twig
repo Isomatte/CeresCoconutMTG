@@ -1,92 +1,108 @@
-{# Ein Paket: Ueberschrift je nach Stand, Fortschritt, Verlauf.
-   Erwartet package (Format aus TrackingNormalizer), index und count. #}
+{# Ein Paket: Karte "Sendungsstatus" mit Fortschritt und Sendungsnummer, darunter der
+   Sendungsverlauf. Erwartet package (Format aus TrackingNormalizer) und index.
+
+   Der Verlauf zeigt die ersten Ereignisse, der Rest klappt ueber eine versteckte
+   Checkbox auf (ohne JavaScript). Am Desktop nach Tagen gruppiert mit Uhrzeit links,
+   mobil als Liste mit Ort und Zeit unter dem Text (siehe Styles.twig). #}
 
 {% set T = 'CeresCoconutMTG::Template.' %}
 {% set visibleEvents = 4 %}
+{% set events = package.events %}
+{% set eventCount = events | length %}
+{% set hasMore = eventCount > visibleEvents %}
+{% set attention = package.state in ['problem', 'returned'] %}
+{% set carrierKnown = package.carrier in ['ups', 'dhl'] %}
 
-{% if package.state == 'returned' %}
-    {% set headline = trans(T ~ 'trackingHeadlineReturned') %}
-    {% set text = trans(T ~ 'trackingTextReturned') %}
-{% elseif package.stage == 4 %}
-    {% set headline = trans(T ~ 'trackingHeadlineDelivered') %}
-    {% if package.deliveredAt.time %}
-        {% set text = trans(T ~ 'trackingDeliveredAt', {'date': package.deliveredAt.label, 'time': package.deliveredAt.time}) %}
-    {% else %}
-        {% set text = trans(T ~ 'trackingDeliveredOn', {'date': package.deliveredAt.label}) %}
-    {% endif %}
-{% elseif package.state == 'problem' %}
-    {% set headline = trans(T ~ 'trackingHeadlineProblem') %}
-    {% set text = trans(T ~ 'trackingTextProblem', {'message': package.message}) %}
-{% elseif package.stage == 3 %}
-    {% set headline = trans(T ~ 'trackingHeadlineOutForDelivery') %}
-    {% if package.estimated and package.estimated.from and package.estimated.to %}
-        {% set text = trans(T ~ 'trackingTodayWindow', {'from': package.estimated.from, 'to': package.estimated.to}) %}
-    {% else %}
-        {% set text = '' %}
-    {% endif %}
-{% elseif package.stage == 2 %}
-    {% set headline = trans(T ~ 'trackingHeadlineInTransit') %}
-    {% if package.estimated and package.estimated.from and package.estimated.to %}
-        {% set text = trans(T ~ 'trackingEstimatedWindow', {'date': package.estimated.label, 'from': package.estimated.from, 'to': package.estimated.to}) %}
-    {% elseif package.estimated %}
-        {% set text = trans(T ~ 'trackingEstimated', {'date': package.estimated.label}) %}
-    {% else %}
-        {% set text = '' %}
-    {% endif %}
-{% else %}
-    {% set headline = trans(T ~ 'trackingHeadlinePacked') %}
-    {% if package.error %}
-        {% set text = trans(T ~ 'trackingTextError') %}
-    {% else %}
-        {% set text = trans(T ~ 'trackingTextPacked', {'carrier': package.carrierName}) %}
-    {% endif %}
-{% endif %}
+<section class="mtg-card mtg-card--raised mtg-status{% if attention %} is-attention{% endif %}">
+    <div class="mtg-status__top">
+        <h2 class="mtg-card__title">{{ trans(T ~ 'trackingStatusTitle') }}</h2>
+        {% include "CeresCoconutMTG::ShipmentTracking.Partials.Steps" with {
+            'stage': package.state == 'returned' ? 2 : package.stage,
+            'problem': attention
+        } only %}
+    </div>
 
-<section class="mtg-tracking__card mtg-tracking__package{% if package.state in ['problem', 'returned'] %} is-attention{% endif %}{% if package.stage == 4 %} is-delivered{% endif %}">
-    {% if count > 1 %}
-        <p class="mtg-tracking__package-count">{{ trans(T ~ 'trackingPackageOf', {'index': index, 'count': count}) }}</p>
-    {% endif %}
+    <div class="mtg-status__foot">
+        <div class="mtg-status__id">
+            <span class="mtg-status__carrier" aria-hidden="true">
+                {% if carrierKnown %}
+                    {{ package.carrierName }}
+                {% else %}
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M21 8l-9-5-9 5v8l9 5 9-5V8z"></path><path d="M3 8l9 5 9-5M12 13v8"></path></svg>
+                {% endif %}
+            </span>
+            <span class="mtg-status__number">
+                <span class="mtg-status__number-label">
+                    {% if carrierKnown %}
+                        <span class="mtg-only-desktop">{{ trans(T ~ 'trackingNumber') }}</span>
+                        <span class="mtg-only-mobile">{{ trans(T ~ 'trackingNumberCarrier', {'carrier': package.carrierName}) }}</span>
+                    {% else %}
+                        {{ trans(T ~ 'trackingNumber') }}
+                    {% endif %}
+                </span>
+                <span class="mtg-status__number-value">{{ package.number }}</span>
+            </span>
+            <button type="button" class="mtg-copy mtg-press" data-mtg-copy="{{ package.number }}"
+                    data-mtg-copied="{{ trans(T ~ 'trackingCopied') }}"
+                    aria-label="{{ trans(T ~ 'trackingCopyNumber') }}" title="{{ trans(T ~ 'trackingCopyNumber') }}">
+                <svg class="mtg-copy__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h8"></path></svg>
+                <svg class="mtg-copy__done" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>
+            </button>
+        </div>
 
-    <h2 class="mtg-tracking__headline">{{ headline }}</h2>
-    {% if text %}
-        <p class="mtg-tracking__text">{{ text }}</p>
-    {% endif %}
-    {% if package.stage == 4 and package.deliveryLocation and package.deliveryLocation | lower not in ['privat', 'residential'] %}
-        <p class="mtg-tracking__text">{{ trans(T ~ 'trackingDeliveryLocation', {'location': package.deliveryLocation}) }}</p>
-    {% endif %}
-
-    {% include "CeresCoconutMTG::ShipmentTracking.Partials.Steps" with {
-        'stage': package.state == 'returned' ? 2 : package.stage,
-        'problem': package.state in ['problem', 'returned']
-    } only %}
-
-    <dl class="mtg-tracking__number">
-        <dt>{{ trans(T ~ 'trackingNumber') }}</dt>
-        <dd>
-            {{ package.number }}
-            {% if package.carrierUrl %}
-                <a href="{{ package.carrierUrl }}" target="_blank" rel="noopener noreferrer">{{ trans(T ~ 'trackingCarrierLink', {'carrier': package.carrierName}) }}</a>
-            {% endif %}
-        </dd>
-    </dl>
-
-    {% if package.events | length > 0 %}
-        <h3 class="mtg-tracking__subheadline">{{ trans(T ~ 'trackingHistory') }}</h3>
-        <ol class="mtg-timeline">
-            {% for event in package.events | slice(0, visibleEvents) %}
-                {% include "CeresCoconutMTG::ShipmentTracking.Partials.Event" with {'event': event, 'latest': loop.first} only %}
-            {% endfor %}
-        </ol>
-
-        {% if package.events | length > visibleEvents %}
-            <details class="mtg-timeline__more">
-                <summary>{{ trans(T ~ 'trackingShowAllEvents', {'count': package.events | length}) }}</summary>
-                <ol class="mtg-timeline">
-                    {% for event in package.events | slice(visibleEvents) %}
-                        {% include "CeresCoconutMTG::ShipmentTracking.Partials.Event" with {'event': event, 'latest': false} only %}
-                    {% endfor %}
-                </ol>
-            </details>
+        {% if package.carrierUrl %}
+            <a class="mtg-status__link mtg-press" href="{{ package.carrierUrl }}" target="_blank" rel="noopener noreferrer">
+                {{ trans(T ~ 'trackingCarrierLink', {'carrier': package.carrierName}) }}
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"></path></svg>
+            </a>
         {% endif %}
-    {% endif %}
+    </div>
 </section>
+
+{% if eventCount > 0 %}
+    <section class="mtg-card mtg-history">
+        <h2 class="mtg-card__title">{{ trans(T ~ 'trackingHistory') }}</h2>
+
+        {% if hasMore %}
+            <input type="checkbox" class="mtg-sr-only mtg-history__toggle" id="mtg-history-more-{{ index }}">
+        {% endif %}
+
+        <div class="mtg-history__box">
+            <ol class="mtg-history__list">
+                {% for event in events %}
+                    {% set extra = loop.index0 >= visibleEvents %}
+                    {% set newDay = event.dateLabel and (loop.first or events[loop.index0 - 1].dateLabel != event.dateLabel) %}
+
+                    {% if newDay %}
+                        <li class="mtg-history__day{% if extra %} is-extra{% endif %}">{{ event.dateLabel | capitalize }}</li>
+                    {% endif %}
+
+                    <li class="mtg-event{% if loop.first %} is-latest{% endif %}{% if event.problem %} is-problem{% endif %}{% if extra %} is-extra{% endif %}{% if hasMore and loop.index == visibleEvents %} is-fold{% endif %}{% if loop.last %} is-last{% endif %}">
+                        <span class="mtg-event__time">{{ event.time }}</span>
+                        <span class="mtg-event__rail" aria-hidden="true"><span class="mtg-event__dot"></span><span class="mtg-event__line"></span></span>
+                        <span class="mtg-event__body">
+                            <span class="mtg-event__text">{{ event.text }}</span>
+                            {# Mobil: "Ort · Heute 07:15", am Desktop nur der Ort #}
+                            <span class="mtg-event__meta">
+                                {%- if event.location -%}
+                                    <span class="mtg-event__where">{{ event.location }}</span>
+                                {%- endif -%}
+                                {%- if event.dateLabel -%}
+                                    <span class="mtg-event__when">{% if event.location %} · {% endif %}{{ event.dateLabel | capitalize }}{% if event.time %} {{ event.time }}{% endif %}</span>
+                                {%- endif -%}
+                            </span>
+                        </span>
+                    </li>
+                {% endfor %}
+            </ol>
+
+            {% if hasMore %}
+                <label class="mtg-history__more mtg-press" for="mtg-history-more-{{ index }}">
+                    <span class="mtg-history__more-show">{{ trans(T ~ 'trackingShowAllEvents', {'count': eventCount}) }}</span>
+                    <span class="mtg-history__more-hide">{{ trans(T ~ 'trackingShowLessEvents') }}</span>
+                    <svg class="mtg-history__chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"></path></svg>
+                </label>
+            {% endif %}
+        </div>
+    </section>
+{% endif %}
