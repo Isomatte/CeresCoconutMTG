@@ -46,6 +46,13 @@
 
     padding-bottom: 96px;
     background: var(--mtg-page);
+}
+.mtg-tracking--search { --mtg-page: #f4f4f6; --mtg-hero: #1b2127; padding-bottom: 0; }
+
+/* Schrift nur im eigenen Bereich. Die Produktkacheln der Empfehlungen behalten die
+   Theme-Schrift und das Theme-Design wie auf den Kategorieseiten. */
+.mtg-static,
+.mtg-tracking .mtg-ordered-on {
     color: var(--mtg-text);
     font-family: var(--mtg-font);
     font-size: 15px;
@@ -53,7 +60,6 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
-.mtg-tracking--search { --mtg-page: #f4f4f6; --mtg-hero: #1b2127; padding-bottom: 0; }
 
 /* Theme- und Bootstrap-Vorgaben im eigenen Bereich zuruecksetzen */
 .mtg-static h1, .mtg-static h2, .mtg-static h3 {
@@ -76,7 +82,8 @@
 .mtg-static button, .mtg-static input { font-family: inherit; }
 .mtg-static a { color: var(--mtg-accent-text); text-decoration: none; }
 .mtg-static a:hover { color: var(--mtg-accent-hover); text-decoration: underline; }
-.mtg-tracking :focus-visible { outline: 3px solid var(--mtg-accent-text); outline-offset: 2px; }
+.mtg-static :focus-visible,
+.mtg-tracking .mtg-recos__nav :focus-visible { outline: 3px solid var(--mtg-accent-text); outline-offset: 2px; }
 .mtg-tracking .mtg-hero :focus-visible,
 .mtg-tracking .mtg-contact :focus-visible { outline-color: var(--mtg-on-dark-accent); }
 
@@ -485,7 +492,9 @@
 .mtg-tracking .mtg-help__text { font-size: 15px; line-height: 1.45; color: var(--mtg-muted); }
 .mtg-tracking .mtg-help__link { font-size: 15px; font-weight: 600; }
 
-/* ---------- Empfehlungen (Ceres category-item) ---------- */
+/* ---------- Empfehlungen (Ceres category-item) ----------
+   Nur Ueberschrift und Reihe sind eigenes Design. Die Kacheln selbst bleiben im
+   Theme-Design (main.css, .cmp-product-thumb) wie auf den Kategorieseiten. */
 
 .mtg-tracking .mtg-recos { margin-top: 56px; }
 .mtg-tracking .mtg-recos__head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
@@ -501,7 +510,7 @@
     -webkit-hyphens: manual;
     hyphens: manual;
 }
-.mtg-tracking .mtg-recos__lead { margin: 4px 0 0; color: var(--mtg-muted); font-size: 17px; font-weight: 400; line-height: 1.4; letter-spacing: normal; }
+.mtg-tracking .mtg-recos__lead { margin: 4px 0 0; color: var(--mtg-muted); font-family: var(--mtg-font); font-size: 17px; font-weight: 400; line-height: 1.4; letter-spacing: normal; }
 .mtg-tracking .mtg-recos__nav { display: none; gap: 8px; }
 .mtg-js .mtg-tracking .mtg-recos__nav { display: flex; }
 .mtg-tracking .mtg-round-btn {
@@ -518,48 +527,20 @@
     cursor: pointer;
 }
 .mtg-tracking .mtg-round-btn:hover { background: #1d1f23; }
+/* Innenabstand, damit der Schatten der Theme-Kacheln nicht abgeschnitten wird;
+   der negative Rand gleicht ihn aus. */
 .mtg-tracking .mtg-recos__track {
     display: flex;
     gap: 20px;
-    padding-bottom: 8px;
+    margin: 0 -10px;
+    padding: 6px 10px 0;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
+    scroll-padding: 0 10px;
     scrollbar-width: thin;
     -webkit-overflow-scrolling: touch;
 }
-.mtg-tracking .mtg-recos__card { display: flex; flex: 0 0 264px; min-width: 0; scroll-snap-align: start; }
-.mtg-tracking .mtg-recos__card > * { width: 100%; }
-.mtg-tracking .mtg-recos .cmp-product-thumb {
-    position: relative;
-    height: 100%;
-    margin: 0;
-    overflow: hidden;
-    border: 1px solid var(--mtg-line);
-    border-radius: 22px;
-    background: #fff;
-    font-family: var(--mtg-font);
-}
-.mtg-tracking .mtg-recos .cmp-product-thumb > div { display: flex; flex-direction: column; height: 100%; padding: 16px; }
-.mtg-tracking .mtg-recos .thumb-image { overflow: hidden; border-radius: 16px; background: var(--mtg-tile); }
-.mtg-tracking .mtg-recos .thumb-image img { mix-blend-mode: multiply; }
-.mtg-tracking .mtg-recos .thumb-content { display: flex; flex-direction: column; flex: 1; padding: 12px 0 0; }
-.mtg-tracking .mtg-recos .thumb-title { color: var(--mtg-text); font-size: 15px; font-weight: 600; line-height: 1.35; letter-spacing: normal; }
-.mtg-tracking .mtg-recos .thumb-title:hover { color: var(--mtg-accent-text); }
-.mtg-tracking .mtg-recos .thumb-meta { margin-top: auto; padding-top: 10px; }
-.mtg-tracking .mtg-recos .crossprice { color: var(--mtg-muted); font-size: 12px; }
-.mtg-tracking .mtg-recos .price { color: var(--mtg-text); font-size: 20px; font-weight: 600; }
-.mtg-tracking .mtg-recos .crossprice + .price,
-.mtg-tracking .mtg-recos .price-view-port + .price { color: #b42318; }
-.mtg-tracking .mtg-recos .vat { margin-top: 4px; font-size: 12px; }
-.mtg-tracking .mtg-recos .availability { align-self: flex-start; }
-.mtg-tracking .mtg-recos .btn-primary {
-    border-color: var(--mtg-accent-text);
-    border-radius: 999px;
-    background: var(--mtg-accent-text);
-    color: #fff;
-    font-weight: 600;
-}
-.mtg-tracking .mtg-recos .btn-primary:hover { border-color: var(--mtg-accent-hover); background: var(--mtg-accent-hover); }
+.mtg-tracking .mtg-recos__card { flex: 0 0 264px; min-width: 0; scroll-snap-align: start; }
 
 .mtg-tracking .mtg-ordered-on { display: none; }
 
@@ -719,13 +700,8 @@
     .mtg-tracking .mtg-recos__title { color: var(--mtg-muted); font-size: 15px; font-weight: 600; letter-spacing: normal; }
     .mtg-tracking .mtg-recos__lead,
     .mtg-js .mtg-tracking .mtg-recos__nav { display: none; }
-    .mtg-tracking .mtg-recos__track { gap: 12px; margin: 0 -16px; padding: 0 16px 6px; scroll-padding: 0 16px; }
+    .mtg-tracking .mtg-recos__track { gap: 12px; margin: 0 -16px; padding: 6px 16px 0; scroll-padding: 0 16px; }
     .mtg-tracking .mtg-recos__card { flex-basis: 172px; }
-    .mtg-tracking .mtg-recos .cmp-product-thumb { border: 0; border-radius: 16px; }
-    .mtg-tracking .mtg-recos .cmp-product-thumb > div { padding: 10px; }
-    .mtg-tracking .mtg-recos .thumb-image { border-radius: 12px; }
-    .mtg-tracking .mtg-recos .thumb-title { font-size: 14px; line-height: 1.3; }
-    .mtg-tracking .mtg-recos .price { font-size: 16px; }
 
     .mtg-tracking .mtg-ordered-on { display: block; margin-top: 26px; color: var(--mtg-muted); font-size: 13px; letter-spacing: normal; text-align: center; }
 }
