@@ -37,8 +37,8 @@
         },
         {
             "key"                   :"CeresCoconutMTG\\Containers\\ShipmentTrackingOrderHistoryContainer",
-            "name"                  :"Sendungsverfolgung: Button in der Auftragshistorie",
-            "description"           :"Button 'Sendung verfolgen' je Bestellung im Kundenkonto. Verknuepfen mit 'Mein Konto: Zahlungsinformationen in der Auftragshistorie'.",
+            "name"                  :"Sendungsverfolgung: Button Sendung verfolgen",
+            "description"           :"Button 'Sendung verfolgen' zu einer Bestellung. Verknuepfen mit 'My account: Additional payment information' (Auftragshistorie) und 'Order confirmation: Additional payment information' (Bestelldetails und Bestellbestaetigung).",
             "defaultLayoutContainer":"Ceres::MyAccount.OrderHistoryPaymentInformation"
         }
     ]

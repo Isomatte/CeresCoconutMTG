@@ -4,16 +4,21 @@ namespace CeresCoconutMTG\Containers;
 
 use Plenty\Plugin\Application;
 use Plenty\Plugin\ConfigRepository;
+use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Templates\Twig;
 
 /**
  * Class ShipmentTrackingOrderHistoryContainer
  *
- * Button "Sendung verfolgen" je Bestellung in der Auftragshistorie im Kundenkonto.
- * Wird mit dem Container "Ceres::MyAccount.OrderHistoryPaymentInformation" verknuepft,
- * den Ceres (MyAccount/Components/OrderHistory.twig) je Bestellung mit entry.order
- * aufruft. Der Link enthaelt nur die Bestellnummer, die Seite erkennt den
- * eingeloggten Kunden (ShipmentTrackingService::lookupForLoggedInCustomer).
+ * Button "Sendung verfolgen" zu einer Bestellung. Verknuepfen mit
+ * - "Ceres::MyAccount.OrderHistoryPaymentInformation": je Bestellung in der
+ *   Auftragshistorie im Kundenkonto (Ceres ruft ihn mit entry.order auf),
+ * - "Ceres::OrderConfirmation.AdditionalPaymentInformation": in den Bestelldetails
+ *   (Popup im Kundenkonto und Bestellbestaetigung; auch ConversionCheckout ruft ihn auf).
+ *
+ * Eingeloggte Kunden erkennt die Seite selbst (lookupForLoggedInCustomer). Auf der
+ * Bestellbestaetigung von Gaesten steht der Zugangsschluessel in der URL
+ * (?orderId=...&accessKey=...) und wird mitgegeben.
  *
  * @package CeresCoconutMTG\Containers
  */
@@ -62,8 +67,19 @@ class ShipmentTrackingOrderHistoryContainer
             return '';
         }
 
+        $trackingUrl = '/sendungsverfolgung/?order=' . $orderId;
+
+        /** @var Request $request */
+        $request = pluginApp(Request::class);
+        $accessKey = $request->get('accessKey', '');
+        if ((int)$request->get('orderId', 0) === $orderId
+            && is_string($accessKey)
+            && preg_match('/^[A-Za-z0-9]{4,64}$/', $accessKey)) {
+            $trackingUrl .= '&key=' . $accessKey;
+        }
+
         return $twig->render('CeresCoconutMTG::ShipmentTracking.Containers.OrderHistoryButton', [
-            'trackingUrl' => '/sendungsverfolgung/?order=' . $orderId
+            'trackingUrl' => $trackingUrl
         ]);
     }
 }

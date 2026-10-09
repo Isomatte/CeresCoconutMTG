@@ -4,7 +4,7 @@
 
 ### Hinzugefügt
 
-- Button "Sendung verfolgen" je Bestellung in der Auftragshistorie im Kundenkonto (Datenanbieter "Sendungsverfolgung: Button in der Auftragshistorie", Container "Ceres::MyAccount.OrderHistoryPaymentInformation").
+- Button "Sendung verfolgen" (Datenanbieter "Sendungsverfolgung: Button Sendung verfolgen"): je Bestellung in der Auftragshistorie im Kundenkonto (Container "Ceres::MyAccount.OrderHistoryPaymentInformation") sowie in den Bestelldetails und auf der Bestellbestätigung (Container "Ceres::OrderConfirmation.AdditionalPaymentInformation"). Auf der Bestellbestätigung wird der Zugangsschlüssel aus der URL mitgegeben, damit der Link auch für Gäste direkt funktioniert.
 - `/sendungsverfolgung/?order=...` ohne PLZ oder Schlüssel für eingeloggte Kunden, wenn die Bestellung zu ihrem Konto gehört. Sonst Formular mit vorausgefüllter Bestellnummer.
 
 ## v1.0.9 (2026-10-08)

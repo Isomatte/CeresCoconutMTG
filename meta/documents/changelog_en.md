@@ -4,7 +4,7 @@
 
 ### Added
 
-- "Track shipment" button for each order in the order history of the customer account (data provider "Sendungsverfolgung: Button in der Auftragshistorie", container "Ceres::MyAccount.OrderHistoryPaymentInformation").
+- "Track shipment" button (data provider "Sendungsverfolgung: Button Sendung verfolgen"): for each order in the order history of the customer account (container "Ceres::MyAccount.OrderHistoryPaymentInformation") and in the order details and on the order confirmation (container "Ceres::OrderConfirmation.AdditionalPaymentInformation"). On the order confirmation the access key from the URL is passed on so the link also works for guests.
 - `/sendungsverfolgung/?order=...` without postcode or key for logged-in customers if the order belongs to their account. Otherwise the form with the order number pre-filled.
 
 ## v1.0.9 (2026-10-08)
