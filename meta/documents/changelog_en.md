@@ -1,5 +1,11 @@
 # Release Notes for CeresCoconutMTG
 
+## v1.0.14 (2026-10-12)
+
+### Changed
+
+- Header e-mail address is smaller (15 px) and uses an envelope icon instead of the phone icon.
+
 ## v1.0.13 (2026-10-12)
 
 ### Changed

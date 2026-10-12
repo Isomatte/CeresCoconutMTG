@@ -1,5 +1,11 @@
 # Release Notes für CeresCoconutMTG
 
+## v1.0.14 (2026-10-12)
+
+### Geändert
+
+- E-Mail-Adresse im Header kleiner (15 px) und mit Brief-Icon statt Telefonhörer.
+
 ## v1.0.13 (2026-10-12)
 
 ### Geändert

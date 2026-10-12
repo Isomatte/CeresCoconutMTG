@@ -685,6 +685,22 @@ header .contact_details a:first-of-type:before{
     background-repeat: no-repeat;
     top: 8px;
 }
+header .contact_details a.email{
+    font-size: 15px;
+    letter-spacing: 0.5px;
+    padding-top: 0;
+    padding-left: 0;
+}
+header .contact_details a.email:before{
+    background: url(../documents/img/icon-mail-dark.svg) no-repeat;
+    background-size: 14px 11px;
+    width: 14px;
+    height: 11px;
+    left: -22px;
+    top: 50%;
+    -webkit-transform: translateY(-50%);
+    transform: translateY(-50%);
+}
 header .top-bar{
     border-top: 2px solid rgb(248, 248, 250);
 }
