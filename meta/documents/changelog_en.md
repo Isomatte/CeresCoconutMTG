@@ -1,5 +1,11 @@
 # Release Notes for CeresCoconutMTG
 
+## v1.0.13 (2026-10-12)
+
+### Changed
+
+- Removed the phone number from the header and from the structured data (schema.org). Contact is by e-mail only; the ContactPoint now lists verkauf@mein-tuergriff.de.
+
 ## v1.0.12 (2026-10-09)
 
 ### Fixed
