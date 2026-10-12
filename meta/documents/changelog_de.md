@@ -1,5 +1,11 @@
 # Release Notes für CeresCoconutMTG
 
+## v1.0.15 (2026-10-12)
+
+### Behoben
+
+- Header-Styling für die E-Mail-Adresse (15 px, Brief-Icon) fehlte in main.min.css, die der Shop tatsächlich lädt.
+
 ## v1.0.14 (2026-10-12)
 
 ### Geändert

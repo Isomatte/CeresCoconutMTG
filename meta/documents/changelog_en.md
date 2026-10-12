@@ -1,5 +1,11 @@
 # Release Notes for CeresCoconutMTG
 
+## v1.0.15 (2026-10-12)
+
+### Fixed
+
+- Header e-mail styling (15 px, envelope icon) was missing from main.min.css, which is the stylesheet the shop loads.
+
 ## v1.0.14 (2026-10-12)
 
 ### Changed
